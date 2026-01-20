@@ -1,0 +1,375 @@
+[33mcommit 3c0398404e347c17d6d3aedb1d64c401e5861ff1[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Nipunbhadane123 <nipunbhadane3@gmail.com>
+Date:   Wed Oct 1 22:07:02 2025 +0530
+
+    SIH idea prototype
+
+[1mdiff --git a/.gitignore b/.gitignore[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f12608f[m
+[1m--- /dev/null[m
+[1m+++ b/.gitignore[m
+[36m@@ -0,0 +1,47 @@[m
+[32m+[m[32m# Byte-compiled / optimized / DLL files[m
+[32m+[m[32mpycache/[m
+[32m+[m[32m*.pyc[m
+[32m+[m[32m*.$py.class[m
+[32m+[m
+[32m+[m[32m# C extensions[m
+[32m+[m[32m*.so[m
+[32m+[m
+[32m+[m[32m# Distribution / packaging[m
+[32m+[m[32m.Python[m
+[32m+[m[32mbuild/[m
+[32m+[m[32mdevelop-eggs/[m
+[32m+[m[32mdist/[m
+[32m+[m[32mdownloads/[m
+[32m+[m[32meggs/[m
+[32m+[m[32m.eggs/[m
+[32m+[m[32mlib/[m
+[32m+[m[32mlib64/[m
+[32m+[m[32mparts/[m
+[32m+[m[32msdist/[m
+[32m+[m[32mvar/[m
+[32m+[m[32mwheels/[m
+[32m+[m[32mshare/python-wheels/[m
+[32m+[m[32m*.egg-info/[m
+[32m+[m[32m.installed.cfg[m
+[32m+[m[32m*.egg[m
+[32m+[m[32mMANIFEST[m
+[32m+[m
+[32m+[m[32m# Python virtualenv[m
+[32m+[m[32mvenv/[m
+[32m+[m[32menv/[m
+[32m+[m[32m.venv/[m
+[32m+[m[32m.env[m
+[32m+[m
+[32m+[m[32m# Databases[m
+[32m+[m[32mIMPORTANT: Never commit your database file, especially with patient data.[m
+[32m+[m[32mhealth.db[m
+[32m+[m
+[32m+[m[32m# IDE / Editor specific files[m
+[32m+[m[32m.vscode/[m
+[32m+[m[32m.idea/[m
+[32m+[m[32m*.swp[m
+[32m+[m[32m*.swo[m
+[32m+[m
+[32m+[m[32m# ngrok executable if downloaded in the project folder[m
+[32m+[m[32mngrok[m
+[32m+[m[32mngrok.exe[m
+\ No newline at end of file[m
+[1mdiff --git a/app.py b/app.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..eb27281[m
+[1m--- /dev/null[m
+[1m+++ b/app.py[m
+[36m@@ -0,0 +1,3337 @@[m
+[32m+[m[32m# import sqlite3[m
+[32m+[m[32m# from flask import Flask, render_template, request, redirect, url_for, session, flash[m
+[32m+[m[32m# from werkzeug.security import generate_password_hash, check_password_hash[m
+[32m+[m[32m# from twilio.rest import Client[m
+[32m+[m[32m# from twilio.twiml.messaging_response import MessagingResponse[m
+[32m+[m[32m# import json[m
+[32m+[m[32m# import random[m
+[32m+[m[32m# import string[m
+[32m+[m
+[32m+[m[32m# # --- Main Application Setup (CORRECTED FOR SIMPLIFIED STRUCTURE) ---[m
+[32m+[m[32m# app = Flask(__name__,[m
+[32m+[m[32m#             template_folder='english/templates',[m
+[32m+[m[32m#             static_folder='english')[m
+[32m+[m[32m# app.secret_key = 'gramin_health_secret_key'[m[41m [m
+[32m+[m
+[32m+[m[32m# # --- TWILIO CONFIGURATION ---[m
+[32m+[m[32m# ACCOUNT_SID = "AC54fb96ca2653e2cd8df8e0ad874c1c90"[m[41m [m
+[32m+[m[32m# AUTH_TOKEN = "e81c18627c75ce6092b4d8773ab0855a"[m
+[32m+[m[32m# TWILIO_PHONE_NUMBER = "+15512398148"[m[41m [m
+[32m+[m[32m# HEALTH_WORKER_PHONE = "+18777804236"[m[41m [m
+[32m+[m
+[32m+[m[32m# twilio_client = Client(ACCOUNT_SID, AUTH_TOKEN)[m
+[32m+[m
+[32m+[m[32m# # --- Database Helper Function ---[m
+[32m+[m[32m# def get_db_connection():[m
+[32m+[m[32m#     conn = sqlite3.connect('health.db', check_same_thread=False)[m
+[32m+[m[32m#     conn.row_factory = sqlite3.Row[m
+[32m+[m[32m#     return conn[m
+[32m+[m
+[32m+[m[32m# # --- Alert Function ---[m
+[32m+[m[32m# def send_alert(patient_number, message):[m
+[32m+[m[32m#     try:[m
+[32m+[m[32m#         twilio_client.messages.create([m
+[32m+[m[32m#             to=HEALTH_WORKER_PHONE,[m
+[32m+[m[32m#             from_=TWILIO_PHONE_NUMBER,[m
+[32m+[m[32m#             body=f"ALERT from {patient_number}: {message}"[m
+[32m+[m[32m#         )[m
+[32m+[m[32m#         print(f"Alert sent successfully to {HEALTH_WORKER_PHONE}")[m
+[32m+[m[32m#     except Exception as e:[m
+[32m+[m[32m#         print(f"Error sending Twilio alert: {e}")[m
+[32m+[m
+[32m+[m[32m# # --- SMS Webhook Route ---[m
+[32m+[m[32m# @app.route("/sms", methods=['POST'])[m
+[32m+[m[32m# def sms_webhook():[m
+[32m+[m[32m#     incoming_msg = request.values.get('Body', '').strip()[m
+[32m+[m[32m#     from_number = request.values.get('From', '')[m
+[32m+[m[32m#     print(f"Incoming message from {from_number}: '{incoming_msg}'")[m
+[32m+[m[41m    [m
+[32m+[m[32m#     conn = get_db_connection()[m
+[32m+[m[32m#     patient = conn.execute('SELECT * FROM patients WHERE phone_number = ?', (from_number,)).fetchone()[m
+[32m+[m[41m    [m
+[32m+[m[32m#     response = MessagingResponse()[m
+[32m+[m[41m    [m
+[32m+[m[32m#     if not patient:[m
+[32m+[m[32m#         response.message("This phone number is not registered. Please sign up on our website to submit readings.")[m
+[32m+[m[32m#         conn.close()[m
+[32m+[m[32m#         return str(response)[m
+[32m+[m
+[32m+[m[32m#     parts = incoming_msg.upper().split()[m
+[32m+[m[32m#     try:[m
+[32m+[m[32m#         if parts[0] == 'BP' and len(parts) == 3:[m
+[32m+[m[32m#             systolic, diastolic = int(parts[1]), int(parts[2])[m
+[32m+[m[32m#             conn.execute('INSERT INTO readings (patient_id, reading_type, value1, value2) VALUES (?, ?, ?, ?)',[m
+[32m+[m[32m#                          (patient['id'], 'BP', systolic, diastolic))[m
+[32m+[m[32m#             response.message(f"Hi {patient['name']}, your BP reading {systolic}/{diastolic} is recorded. Thank you.")[m
+[32m+[m[32m#             if systolic > 140 or diastolic > 90:[m
+[32m+[m[32m#                 send_alert(from_number, f"High BP: {systolic}/{diastolic}")[m
+[32m+[m[32m#         elif parts[0] == 'SUGAR' and len(parts) == 2:[m
+[32m+[m[32m#             sugar_level = int(parts[1])[m
+[32m+[m[32m#             conn.execute('INSERT INTO readings (patient_id, reading_type, value1) VALUES (?, ?, ?)',[m
+[32m+[m[32m#                          (patient['id'], 'SUGAR', sugar_level))[m
+[32m+[m[32m#             response.message(f"Hi {patient['name']}, your Sugar reading {sugar_level} is recorded. Thank you.")[m
+[32m+[m[32m#             if sugar_level > 180:[m
+[32m+[m[32m#                 send_alert(from_number, f"High Sugar: {sugar_level}")[m
+[32m+[m[32m#         else:[m
+[32m+[m[32m#             response.message("Invalid format. Please use: 'BP 120 80' or 'SUGAR 150'.")[m
+[32m+[m[32m#     except (ValueError, IndexError):[m
+[32m+[m[32m#         response.message("Invalid format. Please use: 'BP 120 80' or 'SUGAR 150'.")[m
+[32m+[m[32m#     finally:[m
+[32m+[m[32m#         conn.commit()[m
+[32m+[m[32m#         conn.close()[m
+[32m+[m[41m        [m
+[32m+[m[32m#     return str(response)[m
+[32m+[m
+[32m+[m[32m# # --- Website Routes ---[m
+[32m+[m[32m# @app.route("/")[m
+[32m+[m[32m# def home():[m
+[32m+[m[32m#     return render_template("index.html")[m
+[32m+[m
+[32m+[m[32m# # ... (keep all your existing app.py code before the signup function) ...[m
+[32m+[m
+[32m+[m[32m# @app.route("/signup", methods=['GET', 'POST'])[m
+[32m+[m[32m# def signup():[m
+[32m+[m[32m#     if request.method == 'POST':[m
+[32m+[m[32m#         # --- Get all the form data ---[m
+[32m+[m[32m#         name = request.form['name'][m
+[32m+[m[32m#         phone = request.form['phone_number'].strip()[m
+[32m+[m[32m#         asha_phone = request.form['asha_worker_phone'].strip()[m
+[32m+[m[32m#         password = request.form['password'][m
+[32m+[m[41m        [m
+[32m+[m[32m#         # --- Get optional demographic data ---[m
+[32m+[m[32m#         # Use .get() to avoid errors if the fields are empty[m
+[32m+[m[32m#         age = request.form.get('age')[m
+[32m+[m[32m#         gender = request.form.get('gender')[m
+[32m+[m[32m#         village = request.form.get('village')[m
+[32m+[m
+[32m+[m[32m#         # --- Format both phone numbers correctly ---[m
+[32m+[m[32m#         if phone.startswith('0'):[m
+[32m+[m[32m#             phone = phone[1:][m
+[32m+[m[32m#         if not phone.startswith('+91'):[m
+[32m+[m[32m#             phone = f"+91{phone}"[m
+[32m+[m[41m            [m
+[32m+[m[32m#         if asha_phone.startswith('0'):[m
+[32m+[m[32m#             asha_phone = asha_phone[1:][m
+[32m+[m[32m#         if not asha_phone.startswith('+91'):[m
+[32m+[m[32m#             asha_phone = f"+91{asha_phone}"[m
+[32m+[m[41m            [m
+[32m+[m[32m#         hashed_password = generate_password_hash(password)[m
+[32m+[m[32m#         conn = get_db_connection()[m
+[32m+[m[32m#         try:[m
+[32m+[m[32m#             # --- Insert all the new data into the database ---[m
+[32m+[m[32m#             conn.execute("""[m
+[32m+[m[32m#                 INSERT INTO patients (name, phone_number, password_hash, asha_worker_phone, age, gender, village)[m[41m [m
+[32m+[m[32m#                 VALUES (?, ?, ?, ?, ?, ?, ?)[m
+[32m+[m[32m#                 """,[m
+[32m+[m[32m#                 (name, phone, hashed_password, asha_phone, age, gender, village)[m
+[32m+[m[32m#             )[m
+[32m+[m[32m#             conn.commit()[m
+[32m+[m[32m#         except sqlite3.IntegrityError:[m
+[32m+[m[32m#             flash("This Patient Phone Number is already registered.", "danger")[m
+[32m+[m[32m#             conn.close()[m
+[32m+[m[32m#             return redirect(url_for('signup'))[m
+[32m+[m[32m#         finally:[m
+[32m+[m[32m#             conn.close()[m
+[32m+[m[41m            [m
+[32m+[m[32m#         flash("Patient registration successful! Please log in.", "success")[m
+[32m+[m[32m#         return redirect(url_for('login'))[m
+[32m+[m[41m        [m
+[32m+[m[32m#     return render_template("signup.html")[m
+[32m+[m
+[32m+[m[32m# # ... (the rest of your app.py code remains the same) ...[m
+[32m+[m
+[32m+[m
+[32m+[m[32m# # --- NEW: PHARMACY ECOSYSTEM ROUTES ---[m
+[32m+[m
+[32m+[m[32m# @app.route("/pharmacy/login", methods=['GET', 'POST'])[m
+[32m+[m[32m# def pharmacy_login():[m
+[32m+[m[32m#     """Handles the login for pharmacy staff."""[m
+[32m+[m[32m#     if request.method == 'POST':[m
+[32m+[m[32m#         email = request.form['email'][m
+[32m+[m[32m#         password = request.form['password'][m
+[32m+[m[32m#         # For this project, we use a simple, hardcoded login.[m
+[32m+[m[32m#         if email == "pharma@nabha.gov" and password == "pharma123":[m
+[32m+[m[32m#             session['pharmacy_logged_in'] = True[m
+[32m+[m[32m#             flash("Pharmacy login successful!", "success")[m
+[32m+[m[32m#             return redirect(url_for('pharmacy_dashboard'))[m
+[32m+[m[32m#         else:[m
+[32m+[m[32m#             flash("Invalid pharmacy credentials.", "danger")[m
+[32m+[m[32m#             return redirect(url_for('pharmacy_login'))[m
+[32m+[m[32m#     # This route requires the 'pharmacy_login.html' template to exist.[m
+[32m+[m[32m#     return render_template("english/templates/pharmacy_login.html")[m
+[32m+[m
+[32m+[m
+[32m+[m[32m# @app.route("/pharmacy/dashboard", methods=['GET', 'POST'])[m
+[32m+[m[32m# def pharmacy_dashboard():[m
+[32m+[m[32m#     """Dashboard for pharmacy staff to manage inventory."""[m
+[32m+[m[32m#     if not session.get('pharmacy_logged_in'):[m
+[32m+[m[32m#         return redirect(url_for('pharmacy_login'))[m
+[32m+[m
+[32m+[m[32m#     conn = get_db_connection()[m
+[32m+[m
+[32m+[m[32m#     if request.method == 'POST':[m
+[32m+[m[32m#         # This block handles the form submission when inventory is updated.[m
+[32m+[m[32m#         for key, value in request.form.items():[m
+[32m+[m[32m#             if key.startswith('stock_status_'):[m
+[32m+[m[32m#                 inventory_id = key.split('_')[-1][m
+[32m+[m[32m#                 conn.execute("UPDATE pharmacy_inventory SET stock_status = ? WHERE id = ?", (value, inventory_id))[m
+[32m+[m[32m#         conn.commit()[m
+[32m+[m[32m#         flash("Inventory has been updated successfully.", "success")[m
+[32m+[m[32m#         return redirect(url_for('pharmacy_dashboard'))[m
+[32m+[m
+[32m+[m[32m#     # This block fetches all the data to display on the page.[m
+[32m+[m[32m#     pharmacies = conn.execute("SELECT * FROM pharmacies ORDER BY name").fetchall()[m
+[32m+[m[32m#     inventory_data = {}[m
+[32m+[m[32m#     for pharmacy in pharmacies:[m
+[32m+[m[32m#         inventory_items = conn.execute("""[m
+[32m+[m[32m#             SELECT id, medication_name, stock_status[m
+[32m+[m[32m#             FROM pharmacy_inventory[m
+[32m+[m[32m#             WHERE pharmacy_id = ?[m
+[32m+[m[32m#             ORDER BY medication_name[m
+[32m+[m[32m#         """, (pharmacy['id'],)).fetchall()[m
+[32m+[m[32m#         inventory_data[pharmacy['id']] = inventory_items[m
+[32m+[m[41m    [m
+[32m+[m[32m#     conn.close()[m
+[32m+[m[32m#     # This route requires the 'pharmacy_dashboard.html' template to exist.[m
+[32m+[m[32m#     return render_template("english/templates/pharmacy_dashboard.html", pharmacies=pharmacies, inventory_data=inventory_data)[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m[32m# @app.route("/login", methods=['GET', 'POST'])[m
+[32m+[m[32m# def login():[m
+[32m+[m[32m#     if request.method == 'POST':[m
+[32m+[m[32m#         phone = request.form['phone_number'].strip()[m
+[32m+[m[32m#         password = request.form['password'][m
+[32m+[m[32m#         if phone.startswith('0'):[m
+[32m+[m[32m#             phone = phone[1:][m
+[32m+[m[32m#         if not phone.startswith('+91'):[m
+[32m+[m[32m#             phone = f"+91{phone}"[m
+[32m+[m[32m#         conn = get_db_connection()[m
+[32m+[m[32m#         user = conn.execute('SELECT * FROM patients WHERE phone_number = ?', (phone,)).fetchone()[m
+[32m+[m[32m#         conn.close()[m
+[32m+[m[41m        [m
+[32m+[m[32m#         if user and check_password_hash(user['password_hash'], password):[m
+[32m+[m[32m#             session['user_id'] = user['id'][m
+[32m+[m[32m#             session['user_name'] = user['name'][m
+[32m+[m[32m#             return redirect(url_for('user_dashboard'))[m
+[32m+[m[32m#         else:[m
+[32m+[m[32m#             flash("Invalid phone number or password.", "danger")[m
+[32m+[m[32m#             return redirect(url_for('login'))[m
+[32m+[m[32m#     return render_template("login.html")[m
+[32m+[m
+[32m+[m[32m# @app.route('/user_dashboard')[m
+[32m+[m[32m# def user_dashboard():[m
+[32m+[m[32m#     if 'user_id' not in session:[m
+[32m+[m[32m#         return redirect(url_for('login'))[m
+[32m+[m[41m    [m
+[32m+[m[32m#     user_id = session['user_id'][m
+[32m+[m[32m#     user_name = session['user_name'][m
+[32m+[m[32m#     conn = get_db_connection()[m
+[32m+[m[41m    [m
+[32m+[m[32m#     readings = conn.execute("""[m
+[32m+[m[32m#         SELECT reading_type, value1, value2, strftime('%Y-%m-%d %-I:%M %p', timestamp) as formatted_time[m[41m [m
+[32m+[m[32m#         FROM readings WHERE patient_id = ? ORDER BY timestamp DESC[m
+[32m+[m[32m#     """, (user_id,)).fetchall()[m
+[32m+[m[41m    [m
+[32m+[m[32m#     bp_readings = conn.execute("""[m
+[32m+[m[32m#         SELECT value1, value2, strftime('%d-%b', timestamp) as chart_time[m[41m [m
+[32m+[m[32m#         FROM readings WHERE patient_id = ? AND reading_type = 'BP' ORDER BY timestamp ASC LIMIT 7[m
+[32m+[m[32m#     """, (user_id,)).fetchall()[m
+[32m+[m[32m#     conn.close()[m
+[32m+[m
+[32m+[m[32m#     chart_labels = [row['chart_time'] for row in bp_readings][m
+[32m+[m[32m#     systolic_data = [row['value1'] for row in bp_readings][m
+[32m+[m[32m#     diastolic_data = [row['value2'] for row in bp_readings][m
+[32m+[m[41m    [m
+[32m+[m[32m#     return render_template("user_dashboard.html",[m[41m [m
+[32m+[m[32m#                            user_name=user_name,[m[41m [m
+[32m+[m[32m#                            readings=readings,[m
+[32m+[m[32m#                            chart_labels=json.dumps(chart_labels),[m
+[32m+[m[32m#                            systolic_data=json.dumps(systolic_data),[m
+[32m+[m[32m#                            diastolic_data=json.dumps(diastolic_data))[m
+[32m+[m[41m    [m
+[32m+[m[32m# @app.route("/admin_login", methods=['GET', 'POST'])[m
+[32m+[m[32m# def admin_login():[m
+[32m+[m[32m#     if request.method == 'POST':[m
+[32m+[m[32m#         email = request.form['email'][m
+[32m+[m[32m#         password = request.form['password'][m
+[32m+[m[32m#         if email == "admin@health.com" and password == "admin123":[m
+[32m+[m[32m#             session['admin_logged_in'] = True[m
+[32m+[m[32m#             return redirect(url_for('monitoring_dashboard'))[m
+[32m+[m[32m#         else:[m
+[32m+[m[32m#             flash("Invalid admin credentials.", "danger")[m
+[32m+[m[32m#             return redirect(url_for('admin_login'))[m
+[32m+[m[32m#     return render_template("admin_login.html")[m
+[32m+[m
+[32m+[m[32m# @app.route("/dashboard")[m
+[32m+[m[32m# def monitoring_dashboard():[m
+[32m+[m[32m#     if not session.get('admin_logged_in'):[m
+[32m+[m[32m#         return redirect(url_for('admin_login'))[m
+[32m+[m[41m        [m
+[32m+[m[32m#     conn = get_db_connection()[m
+[32m+[m[32m#     patients_from_db = conn.execute("SELECT * FROM patients ORDER BY name").fetchall()[m
+[32m+[m[41m    [m
+[32m+[m[32m#     patients_data = [][m
+[32m+[m[32m#     for patient_row in patients_from_db:[m
+[32m+[m[32m#         patient_dict = dict(patient_row)[m
+[32m+[m[32m#         readings_rows = conn.execute("SELECT reading_type, value1, value2, strftime('%Y-%m-%d %-I:%M %p', timestamp) as formatted_time FROM readings WHERE patient_id = ? ORDER BY timestamp DESC LIMIT 5", (patient_dict['id'],)).fetchall()[m
+[32m+[m[32m#         readings_dicts = [dict(row) for row in readings_rows][m
+[32m+[m[41m        [m
+[32m+[m[32m#         reports_rows = conn.execute("SELECT chief_complaint, symptoms, notes, strftime('%Y-%m-%d %-I:%M %p', timestamp) as formatted_time FROM triage_reports WHERE patient_id = ? ORDER BY timestamp DESC LIMIT 3", (patient_dict['id'],)).fetchall()[m
+[32m+[m[32m#         reports_dicts = [dict(row) for row in reports_rows][m
+[32m+[m[41m        [m
+[32m+[m[32m#         prescriptions_rows = conn.execute("SELECT id, medication_name, dosage FROM prescriptions WHERE patient_id = ? AND is_active = 1", (patient_dict['id'],)).fetchall()[m
+[32m+[m[32m#         prescriptions_dicts = [dict(row) for row in prescriptions_rows][m
+[32m+[m[41m        [m
+[32m+[m[32m#         bp_readings_rows = conn.execute("SELECT value1, value2, strftime('%d-%b', timestamp) as chart_time FROM readings WHERE patient_id = ? AND reading_type = 'BP' ORDER BY timestamp ASC LIMIT 7", (patient_dict['id'],)).fetchall()[m
+[32m+[m[32m#         bp_readings_dicts = [dict(row) for row in bp_readings_rows][m
+[32m+[m[41m        [m
+[32m+[m[32m#         chart_data = { 'labels': [row['chart_time'] for row in bp_readings_dicts], 'systolic': [row['value1'] for row in bp_readings_dicts], 'diastolic': [row['value2'] for row in bp_readings_dicts] }[m
+[32m+[m[41m        [m
+[32m+[m[32m#         patients_data.append({ 'info': patient_dict, 'readings': readings_dicts, 'reports': reports_dicts, 'chart_data': chart_data, 'prescriptions': prescriptions_dicts })[m
+[32m+[m[41m        [m
+[32m+[m[32m#     conn.close()[m
+[32m+[m[32m#     return render_template("monitoring_dashboard.html", all_patients=patients_data)[m
+[32m+[m
+[32m+[m[32m# @app.route('/patient/<int:patient_id>/add_report', methods=['GET', 'POST'])[m
+[32m+[m[32m# def add_triage_report(patient_id):[m
+[32m+[m[32m#     if not session.get('admin_logged_in'):[m
+[32m+[m[32m#         return redirect(url_for('admin_login'))[m
+[32m+[m
+[32m+[m[32m#     conn = get_db_connection()[m
+[32m+[m[32m#     patient = conn.execute('SELECT * FROM patients WHERE id = ?', (patient_id,)).fetchone()[m
+[32m+[m
+[32m+[m[32m#     if request.method == 'POST':[m
+[32m+[m[32m#         chief_complaint = request.form['chief_complai
