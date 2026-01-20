@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Prescription</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    {% include 'navigation.html' %}
+
+    <div class="container mt-5">
+        <h2 class="mb-4">New Prescription for: {{ patient.name }}</h2>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+
+                <!-- Step 1: Form to Select a Medicine -->
+                <form method="GET" action="{{ url_for('add_prescription', patient_id=patient.id) }}"
+                    class="mb-4 p-3 bg-light rounded">
+                    <div class="row g-2 align-items-end">
+                        <div class="col">
+                            <label for="medication_name" class="form-label"><strong>Select a Medication to Check
+                                    Stock</strong></label>
+                            <select class="form-select" id="medication_name" name="medication_name">
+                                {% for med in all_medications %}
+                                <option value="{{ med }}" {% if med==selected_medication %}selected{% endif %}>{{ med }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-secondary">Check Availability</button>
+                        </div>
+                    </div>
+                </form>
+
+                <hr>
+
+                <!-- Step 2: Form to Finalize and Save the Prescription -->
+                <form method="POST" action="{{ url_for('add_prescription', patient_id=patient.id) }}">
+                    <!-- Hidden field to pass the selected medication name -->
+                    <input type="hidden" name="medication_name" value="{{ selected_medication }}">
+
+                    <div class="mb-3">
+                        <label for="dosage" class="form-label"><strong>Dosage & Instructions</strong></label>
+                        <input type="text" class="form-control" id="dosage" name="dosage" required
+                            placeholder="e.g., 1 tablet twice a day after meals">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label"><strong>Additional Notes (Optional)</strong></label>
+                        <textarea class="form-control" id="notes" name="notes" rows="2"
+                            placeholder="e.g., Complete the 5-day course."></textarea>
+                    </div>
+
+                    <!-- Real-time Pharmacy Stock Information -->
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Select Pharmacy for Dispensing</strong></label>
+                        {% if pharmacy_stock %}
+                        {% for stock_info in pharmacy_stock %}
+                        <div
+                            class="form-check p-3 mb-2 rounded {% if stock_info.status == 'In Stock' %}bg-light border-start border-success border-4{% elif stock_info.status == 'Low Stock' %}bg-light border-start border-warning border-4{% else %}bg-light border-start border-danger border-4{% endif %}">
+                            <input class="form-check-input" type="radio" name="pharmacy_id"
+                                id="pharmacy_{{ stock_info.pharmacy.id }}" value="{{ stock_info.pharmacy.id }}"
+                                required>
+                            <label class="form-check-label" for="pharmacy_{{ stock_info.pharmacy.id }}">
+                                <strong>{{ stock_info.pharmacy.name }}</strong> ({{ stock_info.pharmacy.location }}) -
+                                <span class="badge 
+                                            {% if stock_info.status == 'In Stock' %}bg-success
+                                            {% elif stock_info.status == 'Low Stock' %}bg-warning text-dark
+                                            {% else %}bg-danger{% endif %}">
+                                    {{ stock_info.status }}
+                                </span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <p class="text-info">Please select a medication and click "Check Availability" to see stock
+                            levels.</p>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mt-3" {% if not pharmacy_stock %}disabled{% endif
+                        %}>Save and Send Prescription</button>
+                    <a href="{{ url_for('monitoring_dashboard') }}" class="btn btn-secondary mt-3">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

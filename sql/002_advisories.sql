@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS ministry_advisories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    district TEXT NOT NULL,
+    village TEXT NOT NULL,
+    message TEXT NOT NULL,
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

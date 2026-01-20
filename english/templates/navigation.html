@@ -1,0 +1,87 @@
+<!-- This navigation bar is designed to be fixed to the top of the screen -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('home') }}">
+            <img src="{{ url_for('static', filename='asseat_2/logo1.png') }}" alt="Logo" height="40"
+                class="d-inline-block align-text-top">
+            ग्रामीण HealthGuard
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+                </li>
+
+                <!-- NAVIGATION FOR LOGGED-IN USERS -->
+                {% if session.get('health_dept_logged_in') %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('health_dept_overview') }}"><i
+                            class="fa-solid fa-chart-line"></i> Ministry Dashboard</a>
+                </li>
+
+                {% elif session.worker_logged_in %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('monitoring_dashboard') }}"><i
+                            class="fa-solid fa-gauge-high"></i> My Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('asha_training') }}">Training Hub</a>
+                </li>
+
+                {% elif session.doctor_logged_in %}
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('doctor_dashboard') }}"><i
+                            class="fa-solid fa-stethoscope"></i> Doctor Portal</a>
+                </li>
+
+
+
+                {% elif session.user_id %}
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('user_dashboard') }}">My Dashboard</a>
+                </li>
+                {% endif %}
+
+                <!-- LOGOUT BUTTON (Visible if any user is logged in) -->
+                {% if session.worker_logged_in or session.doctor_logged_in or session.health_dept_logged_in or
+                session.user_id %}
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-light btn-sm ms-lg-3" href="{{ url_for('logout') }}"><i
+                            class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                </li>
+
+                <!-- NAVIGATION FOR LOGGED OUT USERS -->
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('login') }}">Patient Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('signup') }}">Register Patient</a>
+                </li>
+
+                <!-- PROFESSIONAL LOGINS DROPDOWN -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-user-tie"></i> Professional Logins
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="{{ url_for('worker_login') }}"><i
+                                    class="fa-solid fa-user-nurse"></i> ASHA Worker</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('doctor_login') }}"><i
+                                    class="fa-solid fa-user-md"></i> **Hospital Doctor**</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('pharmacy_login') }}"><i
+                                    class="fa-solid fa-prescription-bottle-medical"></i> Pharmacy Staff</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('health_dept_login') }}"><i
+                                    class="fa-solid fa-hospital-user"></i> Health Ministry Dept</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

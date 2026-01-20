@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ministry Dashboard - {{ stats.district }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f4f6f9;
+            padding-top: 70px;
+        }
+
+        .top-banner {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .risk-panel {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 5px 5px 0 0;
+            padding: 10px 20px;
+            font-weight: bold;
+        }
+
+        .risk-content {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .safe-panel {
+            background-color: #198754;
+            color: white;
+            border-radius: 5px 5px 0 0;
+            padding: 10px 20px;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'navigation.html' %}
+
+    <div class="container-fluid px-4">
+        <!-- Top Prediction Banner -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="top-banner shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-light text-dark">Prediction for Month: December</span>
+                        <!-- <span class="badge bg-warning text-dark">AI Model v2.4 Active</span> -->
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 border-end">
+                            <h5><i class="fa-solid fa-triangle-exclamation"></i> Identified Risks</h5>
+                            <p class="mb-0 fs-5">
+                                {% if stats.district == 'Dhule' %}
+                                High risk of Respiratory Infections (Flu, Pneumonia)
+                                {% else %}
+                                Minimal seasonal risks detected.
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6 ps-4">
+                            <h5><i class="fa-solid fa-clipboard-check"></i> Recommended Actions</h5>
+                            <p class="mb-0 fs-5">
+                                {% if stats.district == 'Dhule' %}
+                                Vaccination drives & Warm clothing distribution
+                                {% else %}
+                                Routine immunization & hygiene awareness.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Analysis Card -->
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                        <h6 class="text-uppercase text-muted">Cases Analyzed (30 Days)</h6>
+                        <div class="stat-value">{{ stats.total_reports }}</div>
+                        <p class="text-success"><i class="fa-solid fa-chart-line"></i> Real-time Analysis</p>
+
+                        <!-- ASHA UPDATES BUTTON -->
+                        <div class="mt-3">
+                            <button class="btn btn-primary w-100 position-relative" data-bs-toggle="modal"
+                                data-bs-target="#updatesModal">
+                                <i class="fa-solid fa-envelope-open-text"></i> View ASHA Updates
+                                {% if updates %}
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{ updates|length }}
+                                    <span class="visually-hidden">unread messages</span>
+                                </span>
+                                {% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ASHA UPDATES MODAL -->
+        <div class="modal fade" id="updatesModal" tabindex="-1" aria-labelledby="updatesModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="updatesModalLabel"><i class="fa-solid fa-clipboard-list"></i> Field
+                            Reports from ASHA Workers</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% if updates %}
+                        <div class="list-group">
+                            {% for update in updates %}
+                            <div class="list-group-item list-group-item-action" aria-current="true">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1 text-primary">{{ update.village }} ({{ update.worker_phone }})</h5>
+                                    <small class="text-muted">{{ update.responded_at }}</small>
+                                </div>
+                                <p class="mb-1 fw-bold">Status: {{ update.status }}</p>
+                                <p class="mb-1">{{ update.message }}</p>
+                                <small class="text-muted">In response to advisory: "{{ update.advisory_message
+                                    }}"</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fa-regular fa-folder-open fs-1 text-muted mb-3"></i>
+                            <p class="text-muted">No updates received from ASHA workers yet.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Alert / Hotspot Column -->
+            <div class="col-md-6">
+                {% if hotspots %}
+                <div class="risk-panel d-flex justify-content-between align-items-center">
+                    <span><i class="fa-solid fa-map-location-dot"></i> Active Disease Hotspots</span>
+                    <span class="badge bg-light text-danger">{{ hotspots|length }} Detected</span>
+                </div>
+
+                {% for spot in hotspots %}
+                <div class="risk-content shadow-sm mb-3">
+                    <div class="d-flex justify-content-between">
+                        <h4 class="text-danger mb-0">{{ spot.village }}</h4>
+                        <small class="text-danger fw-bold">Trend: {{ spot.trend }} <i
+                                class="fa-solid fa-arrow-trend-up"></i></small>
+                    </div>
+                    <h5 class="fw-bold mt-2">{{ spot.condition }} Detected</h5>
+                    <p>Cases reported: <span class="badge bg-danger rounded-circle">{{ spot.cases }}</span></p>
+                    <div class="mt-3">
+                        <button class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-truck-medical"></i> Deploy
+                            Team</button>
+                        <button class="btn btn-danger btn-sm text-white"
+                            onclick="sendAdvisory('{{ spot.village }}', '{{ spot.condition }}')"><i
+                                class="fa-solid fa-bullhorn"></i> Send Advisory to ASHA</button>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% else %}
+                <div class="safe-panel d-flex justify-content-between align-items-center">
+                    <span><i class="fa-solid fa-shield-virus"></i> Disease Surveillance</span>
+                    <span class="badge bg-light text-success">Secure</span>
+                </div>
+                <div class="risk-content shadow-sm text-center py-5">
+                    <h4 class="text-success"><i class="fa-solid fa-check-circle"></i> No Active Outbreaks</h4>
+                    <p class="text-muted">Surveillance data indicates normal parameters for {{ stats.district }}.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Symptom Distribution Chart -->
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fa-solid fa-chart-pie"></i> Symptom Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="symptomChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('symptomChart');
+
+            // Dynamic data from Flask
+            const serverData = {{ symptom_data | tojson
+        }}; // [Fever, Cough, Headache, Other]
+
+        const data = {
+            labels: ['Fever', 'Cough/Cold', 'Headache', 'Other'],
+            datasets: [{
+                data: serverData.length ? serverData : [0, 0, 0, 1], // Fallback
+                backgroundColor: [
+                    '#ff6384', // Red/Pink
+                    '#36a2eb', // Blue
+                    '#ffce56', // Yellow
+                    '#cc65fe'  // Purple/Grey
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        // If Dhule, keep the 'Outbreak' look (more fever)
+        // If others, maybe balance it, but keeping simple for now.
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+        });
+
+        function sendAdvisory(village, condition) {
+            if (!confirm(`Send urgent advisory to ASHA workers in ${village} regarding ${condition}?`)) return;
+
+            fetch('/health_dept/send_advisory', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    district: '{{ stats.district }}',
+                    village: village,
+                    message: `URGENT ADVISORY: ${condition} detected in ${village}. Please initiate symptomatic survey and awareness drive immediately.`
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Advisory broadcasted to ASHA network successfully!');
+                    } else {
+                        alert('Failed to send advisory.');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('Error connecting to server.');
+                });
+        }
+    </script>
+</body>
+
+</html>

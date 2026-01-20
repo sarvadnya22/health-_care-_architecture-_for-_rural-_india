@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Government Hospital Doctor Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 70px;
+        }
+
+        .report-card {
+            border-left: 5px solid #007bff;
+        }
+
+        .ai-prediction-block {
+            white-space: pre-wrap;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Styling based on risk level (Doctor view) */
+        .risk-high {
+            background-color: #fcebeb;
+            border-left: 5px solid #dc3545;
+        }
+
+        .risk-medium {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+        }
+
+        .risk-low {
+            background-color: #d4edda;
+            border-left: 5px solid #28a745;
+        }
+
+        .risk-default {
+            background-color: #e9ecef;
+            border-left: 5px solid #6c757d;
+        }
+
+        /* Attended Button Styling - for dark headers */
+        .btn-attended {
+            background: transparent;
+            color: #fff;
+            border: 1.5px solid rgba(255, 255, 255, 0.7);
+            font-size: 0.7rem;
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-attended:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border-color: #fff;
+        }
+
+        /* Attended Button - for light backgrounds */
+        .btn-attended-dark {
+            background: transparent;
+            color: #dc3545;
+            border: 1.5px solid #dc3545;
+            font-size: 0.7rem;
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-attended-dark:hover {
+            background: #dc3545;
+            color: #fff;
+            border-color: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'navigation.html' %}
+
+    <div class="container-fluid mt-4">
+        <h2 class="mb-4">Government Hospital Doctor Dashboard</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- 🔥 HIGH RISK PATIENTS SECTION (AI DETECTED) 🔥 -->
+        <div class="card mb-5 border-danger shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fa-solid fa-radiation"></i> High Risk Patients (AI Detected)</h5>
+            </div>
+            <div class="card-body">
+                {% if high_risk_patients %}
+                <div class="row">
+                    {% for patient in high_risk_patients %}
+                    <div class="col-md-4 mb-3" id="patient-card-{{ patient.id }}">
+                        <div class="card h-100 border-danger bg-light">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title text-danger fw-bold mb-0">{{ patient.name }}</h5>
+                                    <button onclick="markPatientAttended({{ patient.id }}, '{{ patient.name }}')"
+                                        class="btn-attended-dark">
+                                        Mark Attended
+                                    </button>
+                                </div>
+                                <p class="card-text mb-1"><strong>Age:</strong> {{ patient.age }} |
+                                    <strong>Village:</strong> {{ patient.village }}
+                                </p>
+
+                                <!-- Show source badge and complaint -->
+                                {% if patient.source == 'TRIAGE' %}
+                                <span class="badge bg-danger mb-2"><i class="fa-solid fa-robot"></i> AI Triage: High
+                                    Risk</span>
+                                {% if patient.latest_complaint %}
+                                <p class="card-text text-danger small mb-1"><strong>Complaint:</strong> {{
+                                    patient.latest_complaint }}</p>
+                                {% endif %}
+                                {% if patient.triage_time %}
+                                <p class="text-muted small mb-2"><i class="fa-regular fa-clock"></i> {{
+                                    patient.triage_time }}</p>
+                                {% endif %}
+                                {% else %}
+                                <span class="badge bg-warning text-dark mb-2"><i
+                                        class="fa-solid fa-triangle-exclamation"></i> Critical Alert</span>
+                                {% endif %}
+
+                                <p class="card-text mb-2"><small class="text-muted">ASHA: {{ patient.asha_worker_phone
+                                        }}</small></p>
+
+                                <div class="d-grid gap-2">
+                                    <a href="{{ url_for('doctor_patient_record', patient_id=patient.id) }}"
+                                        class="btn btn-outline-danger btn-sm">
+                                        <i class="fa-solid fa-file-medical"></i> View Full Record
+                                    </a>
+                                    <a href="{{ url_for('start_video_call', patient_id=patient.id) }}"
+                                        class="btn btn-danger btn-sm">
+                                        <i class="fa-solid fa-video"></i> Immediate Call
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-success mb-0"><i class="fa-solid fa-check-circle"></i> No high risk patients detected at
+                    this moment.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <h4 class="mb-3">New Patient Referrals</h4>
+
+        {% if referrals %}
+        <!-- Priority Tabs -->
+        <ul class="nav nav-tabs mb-4" id="referralTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active text-danger fw-bold" id="emergency-tab" data-bs-toggle="tab"
+                    data-bs-target="#emergency" type="button" role="tab">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Emergency
+                    <span class="badge bg-danger">{{ referrals|selectattr('priority', 'equalto',
+                        'Emergency')|list|length }}</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-warning fw-bold" id="urgent-tab" data-bs-toggle="tab"
+                    data-bs-target="#urgent" type="button" role="tab">
+                    <i class="fa-solid fa-clock"></i> Urgent
+                    <span class="badge bg-warning text-dark">{{ referrals|selectattr('priority', 'equalto',
+                        'Urgent')|list|length }}</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-info fw-bold" id="normal-tab" data-bs-toggle="tab" data-bs-target="#normal"
+                    type="button" role="tab">
+                    <i class="fa-solid fa-clipboard-list"></i> Normal
+                    <span class="badge bg-info">{{ referrals|selectattr('priority', 'equalto', 'Normal')|list|length
+                        }}</span>
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="referralTabContent">
+            <!-- EMERGENCY TAB -->
+            <div class="tab-pane fade show active" id="emergency" role="tabpanel">
+                <div class="row">
+                    {% for referral in referrals if referral.priority == 'Emergency' %}
+                    <div class="col-md-6 mb-4" id="referral-card-{{ referral.id }}">
+                        <div class="card h-100 shadow-sm border-danger">
+                            <div
+                                class="card-header d-flex justify-content-between align-items-center bg-danger text-white">
+                                <strong><i class="fa-solid fa-user-plus"></i> {{ referral.patient_name }}</strong>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-white text-danger">{{ referral.priority }}</span>
+                                    <button onclick="markAttended({{ referral.id }}, '{{ referral.patient_name }}')"
+                                        class="btn-attended">
+                                        Mark Attended
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="text-muted mb-2">Referred from: {{ referral.referred_by_asha }}</h6>
+                                <p class="card-text fs-5">{{ referral.reason }}</p>
+                                <p class="text-muted small"><i class="fa-regular fa-clock"></i> {{ referral.created_at
+                                    }}</p>
+                                <div class="d-grid gap-2">
+                                    <a href="{{ url_for('doctor_patient_record', patient_id=referral.patient_id) }}"
+                                        class="btn btn-outline-danger">
+                                        <i class="fa-solid fa-file-medical"></i> Review Patient
+                                    </a>
+                                    <a href="{{ url_for('start_video_call', patient_id=referral.patient_id) }}"
+                                        class="btn btn-danger">
+                                        <i class="fa-solid fa-video"></i> Start Consultation
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-success"><i class="fa-solid fa-check"></i> No emergency referrals.</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- URGENT TAB -->
+            <div class="tab-pane fade" id="urgent" role="tabpanel">
+                <div class="row">
+                    {% for referral in referrals if referral.priority == 'Urgent' %}
+                    <div class="col-md-6 mb-4" id="referral-card-{{ referral.id }}">
+                        <div class="card h-100 shadow-sm border-warning">
+                            <div
+                                class="card-header d-flex justify-content-between align-items-center bg-warning text-dark">
+                                <strong><i class="fa-solid fa-user-plus"></i> {{ referral.patient_name }}</strong>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-white text-warning">{{ referral.priority }}</span>
+                                    <button onclick="markAttended({{ referral.id }}, '{{ referral.patient_name }}')"
+                                        class="btn-attended">
+                                        Mark Attended
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="text-muted mb-2">Referred from: {{ referral.referred_by_asha }}</h6>
+                                <p class="card-text fs-5">{{ referral.reason }}</p>
+                                <p class="text-muted small"><i class="fa-regular fa-clock"></i> {{ referral.created_at
+                                    }}</p>
+                                <div class="d-grid gap-2">
+                                    <a href="{{ url_for('doctor_patient_record', patient_id=referral.patient_id) }}"
+                                        class="btn btn-outline-warning">
+                                        <i class="fa-solid fa-file-medical"></i> Review Patient
+                                    </a>
+                                    <a href="{{ url_for('start_video_call', patient_id=referral.patient_id) }}"
+                                        class="btn btn-warning text-dark">
+                                        <i class="fa-solid fa-video"></i> Start Consultation
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-success"><i class="fa-solid fa-check"></i> No urgent referrals.</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- NORMAL TAB -->
+            <div class="tab-pane fade" id="normal" role="tabpanel">
+                <div class="row">
+                    {% for referral in referrals if referral.priority == 'Normal' %}
+                    <div class="col-md-6 mb-4" id="referral-card-{{ referral.id }}">
+                        <div class="card h-100 shadow-sm border-info">
+                            <div
+                                class="card-header d-flex justify-content-between align-items-center bg-info text-white">
+                                <strong><i class="fa-solid fa-user-plus"></i> {{ referral.patient_name }}</strong>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-white text-info">{{ referral.priority }}</span>
+                                    <button onclick="markAttended({{ referral.id }}, '{{ referral.patient_name }}')"
+                                        class="btn-attended">
+                                        Mark Attended
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="text-muted mb-2">Referred from: {{ referral.referred_by_asha }}</h6>
+                                <p class="card-text fs-5">{{ referral.reason }}</p>
+                                <p class="text-muted small"><i class="fa-regular fa-clock"></i> {{ referral.created_at
+                                    }}</p>
+                                <div class="d-grid gap-2">
+                                    <a href="{{ url_for('doctor_patient_record', patient_id=referral.patient_id) }}"
+                                        class="btn btn-outline-info">
+                                        <i class="fa-solid fa-file-medical"></i> Review Patient
+                                    </a>
+                                    <a href="{{ url_for('start_video_call', patient_id=referral.patient_id) }}"
+                                        class="btn btn-info">
+                                        <i class="fa-solid fa-video"></i> Start Consultation
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-success"><i class="fa-solid fa-check"></i> No normal priority referrals.
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-success">
+            <i class="fa-solid fa-check-circle"></i> No pending referrals. You are all caught up!
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- AI Case Summary Modal -->
+    <div class="modal fade" id="caseSummaryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fa-solid fa-user-doctor"></i> AI Case Summary</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="summaryLoader" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Generating comprehensive case summary...</p>
+                    </div>
+                    <div id="summaryContent" style="display: none;">
+                        <!-- Markdown content will be rendered here -->
+                        <div id="markdown-output" class="p-3 bg-light rounded"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="window.print()">Print Summary</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Markdown Parser (Marked.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+        function loadCaseSummary(patientId) {
+            const loader = document.getElementById('summaryLoader');
+            const content = document.getElementById('summaryContent');
+            const output = document.getElementById('markdown-output');
+
+            loader.style.display = 'block';
+            content.style.display = 'none';
+            output.innerHTML = '';
+
+            fetch(`/api/agent/case_summary/${patientId}`)
+                .then(response => response.json())
+                .then(data => {
+                    output.innerHTML = marked.parse(data.summary);
+                    loader.style.display = 'none';
+                    content.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    output.innerHTML = '<div class="alert alert-danger">Failed to load case summary.</div>';
+                    loader.style.display = 'none';
+                    content.style.display = 'block';
+                });
+        }
+
+        // Mark referral as attended
+        function markAttended(referralId, patientName) {
+            if (confirm(`Are you sure you attended patient "${patientName}"?`)) {
+                fetch(`/doctor/mark_attended/${referralId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the card from the page with animation
+                            const card = document.getElementById(`referral-card-${referralId}`);
+                            if (card) {
+                                card.style.transition = 'opacity 0.3s, transform 0.3s';
+                                card.style.opacity = '0';
+                                card.style.transform = 'scale(0.9)';
+                                setTimeout(() => card.remove(), 300);
+                            }
+                            alert(`✅ ${patientName} marked as attended!`);
+                        } else {
+                            alert('Error: ' + (data.error || 'Failed to mark as attended'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error: Failed to connect to server');
+                    });
+            }
+        }
+
+        // Mark high-risk patient as attended
+        function markPatientAttended(patientId, patientName) {
+            if (confirm(`Are you sure you attended patient "${patientName}"?`)) {
+                fetch(`/doctor/mark_patient_attended/${patientId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the card from the page with animation
+                            const card = document.getElementById(`patient-card-${patientId}`);
+                            if (card) {
+                                card.style.transition = 'opacity 0.3s, transform 0.3s';
+                                card.style.opacity = '0';
+                                card.style.transform = 'scale(0.9)';
+                                setTimeout(() => card.remove(), 300);
+                            }
+                            alert(`✅ ${patientName} marked as attended!`);
+                        } else {
+                            alert('Error: ' + (data.error || 'Failed to mark as attended'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error: Failed to connect to server');
+                    });
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Assistant - स्वास्थ्य सहायक</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .chat-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title i {
+            font-size: 1.5rem;
+            color: #4ade80;
+        }
+
+        .header-title h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .header-subtitle {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Language Toggle */
+        .lang-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .lang-btn.active {
+            background: #4ade80;
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+
+        /* Chat Container */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            background: #f0f2f5;
+        }
+
+        /* Messages Area */
+        .messages-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Message Bubbles */
+        .message {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            animation: fadeIn 0.3s ease;
+            line-height: 1.5;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 0.65rem;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .typing-indicator.show {
+            display: flex;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-8px);
+            }
+        }
+
+        @keyframes pulse-animation {
+            0% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+            }
+        }
+
+        .pulse-animation {
+            animation: pulse-animation 2s infinite;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            padding: 10px 20px;
+            background: white;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .quick-btn {
+            padding: 8px 16px;
+            border: 1.5px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .quick-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 15px 20px;
+            background: white;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .message-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Markdown styling inside messages */
+        .message strong {
+            font-weight: 600;
+        }
+
+        .message ul,
+        .message ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .message li {
+            margin: 4px 0;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 600px) {
+            .chat-header {
+                padding: 12px 15px;
+            }
+
+            .header-title h1 {
+                font-size: 1rem;
+            }
+
+            .messages-area {
+                padding: 15px;
+            }
+
+            .message {
+                max-width: 90%;
+                padding: 10px 14px;
+            }
+
+            .quick-actions {
+                padding: 8px 15px;
+            }
+
+            .quick-btn {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="chat-header">
+        <div class="header-left">
+            <a href="{{ url_for('user_dashboard') }}" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="header-title">
+                <i class="fa-solid fa-stethoscope"></i>
+                <div>
+                    <h1 id="headerTitle">Health Assistant</h1>
+                    <div class="header-subtitle" id="headerSubtitle">Ask me about your health</div>
+                </div>
+            </div>
+        </div>
+        <div class="lang-toggle">
+            <button class="lang-btn active" id="langEn" onclick="setLanguage('en')">EN</button>
+            <button class="lang-btn" id="langHi" onclick="setLanguage('hi')">हि</button>
+        </div>
+    </div>
+
+    <!-- Chat Container -->
+    <div class="chat-container">
+        <!-- Messages Area -->
+        <div class="messages-area" id="messagesArea">
+            <!-- Messages will be added here dynamically -->
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="typing-indicator" id="typingIndicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="sendQuickAction('prescriptions')">
+                <i class="fa-solid fa-pills"></i>
+                <span id="btnPrescriptions">My Prescriptions</span>
+            </button>
+            <button class="quick-btn" onclick="sendQuickAction('tips')">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span id="btnTips">Health Tips</span>
+            </button>
+            <button class="quick-btn" onclick="sendQuickAction('symptoms')">
+                <i class="fa-solid fa-notes-medical"></i>
+                <span id="btnSymptoms">Report Symptoms</span>
+            </button>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <input type="text" class="message-input" id="messageInput" placeholder="Type your message..."
+                onkeypress="handleKeyPress(event)">
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentLanguage = 'en';
+        let conversationHistory = [];
+        const patientId = {{ patient_id }};
+
+        // Translations
+        const translations = {
+            en: {
+                title: 'Health Assistant',
+                subtitle: 'Ask me about your health',
+                placeholder: 'Type your message...',
+                prescriptions: 'My Prescriptions',
+                tips: 'Health Tips',
+                symptoms: 'Report Symptoms'
+            },
+            hi: {
+                title: 'स्वास्थ्य सहायक',
+                subtitle: 'अपने स्वास्थ्य के बारे में पूछें',
+                placeholder: 'अपना संदेश लिखें...',
+                prescriptions: 'मेरी दवाइयां',
+                tips: 'स्वास्थ्य सुझाव',
+                symptoms: 'लक्षण बताएं'
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            showGreeting();
+        });
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+
+            // Update toggle buttons
+            document.getElementById('langEn').classList.toggle('active', lang === 'en');
+            document.getElementById('langHi').classList.toggle('active', lang === 'hi');
+
+            // Update UI text
+            const t = translations[lang];
+            document.getElementById('headerTitle').textContent = t.title;
+            document.getElementById('headerSubtitle').textContent = t.subtitle;
+            document.getElementById('messageInput').placeholder = t.placeholder;
+            document.getElementById('btnPrescriptions').textContent = t.prescriptions;
+            document.getElementById('btnTips').textContent = t.tips;
+            document.getElementById('btnSymptoms').textContent = t.symptoms;
+        }
+
+        function showGreeting() {
+            const greeting = currentLanguage === 'hi'
+                ? `🩺 <strong>नमस्ते! मैं आपका स्वास्थ्य सहायक हूं।</strong><br><br>
+                   मैं आपकी इन चीज़ों में मदद कर सकता हूं:<br>
+                   • 🤒 अपने लक्षण बताएं और सलाह पाएं<br>
+                   • 💊 अपनी प्रिस्क्रिप्शन देखें<br>
+                   • 💡 स्वास्थ्य सुझाव लें<br><br>
+                   आप क्या जानना चाहते हैं?`
+                : `🩺 <strong>Hello! I'm your Health Assistant.</strong><br><br>
+                   I can help you with:<br>
+                   • 🤒 Report symptoms and get advice<br>
+                   • 💊 View your prescriptions<br>
+                   • 💡 Get health tips<br><br>
+                   How can I help you today?`;
+
+            addMessage(greeting, 'bot');
+        }
+
+        function addMessage(content, type) {
+            const messagesArea = document.getElementById('messagesArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const time = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+            let formattedContent;
+
+            // Check if content is special HTML (starts with <div)
+            if (content.trim().startsWith('<div')) {
+                formattedContent = content;
+            } else {
+                // Parse markdown-like formatting
+                formattedContent = content
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\n/g, '<br>')
+                    .replace(/• /g, '&bull; ');
+                // Parse Links [Text](url)
+                formattedContent = formattedContent.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color: #667eea; text-decoration: underline;">$1</a>');
+            }
+
+            messageDiv.innerHTML = `
+                ${formattedContent}
+                <div class="message-time">${time}</div>
+            `;
+
+            messagesArea.appendChild(messageDiv);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+
+            // Update conversation history
+            conversationHistory.push({
+                role: type === 'user' ? 'user' : 'assistant',
+                content: content.replace(/<[^>]*>/g, '') // Strip HTML for API
+            });
+        }
+
+        function showTyping() {
+            document.getElementById('typingIndicator').classList.add('show');
+            document.getElementById('messagesArea').scrollTop = document.getElementById('messagesArea').scrollHeight;
+        }
+
+        function hideTyping() {
+            document.getElementById('typingIndicator').classList.remove('show');
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+
+            // Show typing indicator
+            showTyping();
+            document.getElementById('sendBtn').disabled = true;
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        patient_id: patientId,
+                        message: message,
+                        language: currentLanguage,
+                        history: conversationHistory.slice(-10) // Last 10 messages
+                    })
+                });
+
+                const data = await response.json();
+
+                hideTyping();
+                document.getElementById('sendBtn').disabled = false;
+
+                if (data.response) {
+                    addMessage(data.response, 'bot');
+                } else {
+                    addMessage(currentLanguage === 'hi'
+                        ? 'क्षमा करें, कुछ गड़बड़ हो गई।'
+                        : 'Sorry, something went wrong.', 'bot');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                hideTyping();
+                document.getElementById('sendBtn').disabled = false;
+                addMessage(currentLanguage === 'hi'
+                    ? 'सर्वर से कनेक्ट नहीं हो पाया।'
+                    : 'Could not connect to server.', 'bot');
+            }
+        }
+
+        function sendQuickAction(action) {
+            let message;
+            if (action === 'prescriptions') {
+                message = currentLanguage === 'hi' ? 'मेरी दवाइयां दिखाओ' : 'Show my prescriptions';
+            } else if (action === 'tips') {
+                message = currentLanguage === 'hi' ? 'स्वास्थ्य सुझाव दो' : 'Give me health tips';
+            } else if (action === 'symptoms') {
+                message = currentLanguage === 'hi'
+                    ? 'मुझे अपने लक्षण बताने हैं'
+                    : 'I want to report my symptoms';
+            }
+
+            document.getElementById('messageInput').value = message;
+            sendMessage();
+        }
+    </script>
+</body>
+
+</html>

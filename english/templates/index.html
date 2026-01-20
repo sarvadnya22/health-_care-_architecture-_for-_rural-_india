@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ग्रामीण HealthGuard - Rural Telemedicine</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Local CSS using url_for -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='data/index.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='data/chatbot.css') }}" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+
+    <!-- Swiper's CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --danger-gradient: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --dark-bg: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.18);
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            padding-top: 70px;
+            background: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* ===== MODERN HERO SECTION ===== */
+        .hero-section {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 80%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 60%);
+            animation: pulse-glow 4s ease-in-out infinite;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 60%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 50%);
+            animation: pulse-glow 5s ease-in-out infinite reverse;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        .hero-content-wrapper {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            padding: 8px 16px;
+            border-radius: 50px;
+            color: #10b981;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .hero-badge i {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        .hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, #10b981, #38ef7d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            max-width: 500px;
+            line-height: 1.7;
+            margin-bottom: 32px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .btn-hero-primary {
+            background: var(--secondary-gradient);
+            color: #fff;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-hero-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(16, 185, 129, 0.4);
+            color: #fff;
+        }
+
+        .btn-hero-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-hero-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .hero-image {
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .hero-image img {
+            max-height: 500px;
+            width: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.3));
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== STATS BAR ===== */
+        .stats-bar {
+            background: #fff;
+            padding: 40px 0;
+            box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.1);
+            margin-top: -50px;
+            position: relative;
+            z-index: 10;
+            border-radius: 24px 24px 0 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        /* ===== HEALTH HUB SECTION ===== */
+        .health-hub {
+            background: linear-gradient(180deg, #fff 0%, #f1f5f9 100%);
+            padding: 80px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-tag {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ===== GLASSMORPHISM HEALTH CARDS ===== */
+        .health-card-modern {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 32px;
+            height: 100%;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .health-card-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--secondary-gradient);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .health-card-modern:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+        }
+
+        .health-card-modern:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-icon-wrapper {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .health-card-modern:hover .card-icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .icon-snake {
+            background: linear-gradient(135deg, #fef3c7, #fcd34d);
+            color: #b45309;
+        }
+
+        .icon-dog {
+            background: linear-gradient(135deg, #dbeafe, #60a5fa);
+            color: #1d4ed8;
+        }
+
+        .icon-fire {
+            background: linear-gradient(135deg, #fee2e2, #fca5a5);
+            color: #dc2626;
+        }
+
+        .icon-sun {
+            background: linear-gradient(135deg, #fef9c3, #fde047);
+            color: #ca8a04;
+        }
+
+        .icon-fever {
+            background: linear-gradient(135deg, #e0e7ff, #a5b4fc);
+            color: #4338ca;
+        }
+
+        .icon-diarrhea {
+            background: linear-gradient(135deg, #d1fae5, #6ee7b7);
+            color: #059669;
+        }
+
+        .card-title-modern {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .card-steps {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .card-steps li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .card-steps li:last-child {
+            border-bottom: none;
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--secondary-gradient);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        /* ===== SOS BUTTON ===== */
+        .sos-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            background: var(--danger-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            z-index: 1050;
+            box-shadow: 0 8px 32px rgba(255, 65, 108, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            animation: sos-pulse 2s infinite;
+        }
+
+        @keyframes sos-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 8px 32px rgba(255, 65, 108, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 8px 48px rgba(255, 65, 108, 0.6), 0 0 0 15px rgba(255, 65, 108, 0.1);
+            }
+        }
+
+        .sos-button:hover {
+            transform: scale(1.1);
+            color: white;
+        }
+
+        /* ===== LANGUAGE TOGGLE ===== */
+        .lang-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .lang-toggle-wrapper label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .lang-hi {
+            display: none;
+        }
+
+        .lang-en {
+            display: block;
+        }
+
+        /* ===== FOOTER MODERN ===== */
+        footer {
+            background: var(--dark-bg);
+            padding: 60px 0 30px;
+            color: #94a3b8;
+        }
+
+        .footer-brand {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .footer-brand .brand-hindi {
+            color: #10b981;
+        }
+
+        .footer-text {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .footer-social a {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .footer-social a:hover {
+            background: var(--secondary-gradient);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 1. Include the reusable navigation bar -->
+    {% include 'navigation.html' %}
+
+    <!-- 2. Container for Flash Messages -->
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- MODERN HERO SECTION -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content-wrapper">
+                    <div class="hero-badge">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        AI-Powered Rural Healthcare
+                    </div>
+                    <h1 class="hero-title">
+                        <span class="gradient-text">ग्रामीण</span> HealthGuard<br>
+                        Telemedicine
+                    </h1>
+                    <p class="hero-subtitle">
+                        Bringing quality healthcare to rural India through AI-assisted diagnosis,
+                        ASHA worker collaboration, and real-time doctor consultations.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="{{ url_for('signup') }}" class="btn-hero-primary">
+                            <i class="fa-solid fa-user-plus"></i> Register Now
+                        </a>
+                        <a href="{{ url_for('login') }}" class="btn-hero-secondary">
+                            <i class="fa-solid fa-right-to-bracket"></i> Patient Login
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image text-center">
+                        <img src="{{ url_for('static', filename='asseat_2/DOCT_1.png') }}" alt="Healthcare" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS BAR -->
+    <section class="stats-bar">
+        <div class="container">
+            <div class="row">
+                <div class="col-6 col-md-3 stat-item">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">Patients Served</div>
+                </div>
+                <div class="col-6 col-md-3 stat-item">
+                    <div class="stat-number">7+</div>
+                    <div class="stat-label">ASHA Workers</div>
+                </div>
+                <div class="col-6 col-md-3 stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">AI Triage</div>
+                </div>
+                <div class="col-6 col-md-3 stat-item">
+                    <div class="stat-number">5+</div>
+                    <div class="stat-label">Districts</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- NEW: Health Hub Section -->
+    <section class="health-hub">
+        <div class="container">
+            <!-- Language Toggle Switch -->
+            <div class="form-check form-switch d-flex justify-content-end align-items-center mb-3">
+                <label class="form-check-label me-2" for="languageToggle"><b>English / हिंदी</b></label>
+                <input class="form-check-input" type="checkbox" role="switch" id="languageToggle">
+            </div>
+
+            <!-- Row 1: Immediate First Aid -->
+            <h2 class="text-center mb-5 lang-en">Immediate First Aid</h2>
+            <h2 class="text-center mb-5 lang-hi">तत्काल प्राथमिक उपचार</h2>
+
+            <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+                <!-- Snake Bite Card -->
+                <div class="col">
+                    <div class="card health-card">
+                        <div class="card-body">
+                            <div class="text-center"><i class="fa-solid fa-staff-snake card-icon"></i></div>
+                            <h5 class="card-title text-center lang-en">Snake Bite</h5>
+                            <h5 class="card-title text-center lang-hi">सांप का काटना</h5>
+                            <div class="card-text lang-en">
+                                <strong>What to do:</strong>
+                                <ol>
+                                    <li>Keep the victim calm and still. Do NOT let them walk.</li>
+                                    <li>Do NOT cut the wound, suck the venom, or apply a tight tourniquet.</li>
+                                    <li>Gently wash the bite with soap and water.</li>
+                                    <li>Go to the nearest hospital immediately.</li>
+                                </ol>
+                            </div>
+                            <div class="card-text lang-hi">
+                                <strong>क्या करें:</strong>
+                                <ol>
+                                    <li>पीड़ित को शांत और स्थिर रखें। उन्हें चलने न दें।</li>
+                                    <li>घाव को न काटें, जहर न चूसें, और न ही कसकर पट्टी बांधें।</li>
+                                    <li>घाव को साबुन और पानी से धीरे से धोएं।</li>
+                                    <li>तुरंत नजदीकी अस्पताल जाएँ।</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Dog Bite Card -->
+                <div class="col">
+                    <div class="card health-card">
+                        <div class="card-body">
+                            <div class="text-center"><i class="fa-solid fa-dog card-icon"></i></div>
+                            <h5 class="card-title text-center lang-en">Dog Bite</h5>
+                            <h5 class="card-title text-center lang-hi">कुत्ते का काटना</h5>
+                            <div class="card-text lang-en">
+                                <strong>What to do:</strong>
+                                <ol>
+                                    <li>Immediately wash the wound with soap and clean, running water for 15 minutes.
+                                    </li>
+                                    <li>Apply a clean bandage.</li>
+                                    <li>See a doctor as soon as possible for an anti-rabies vaccine.</li>
+                                </ol>
+                            </div>
+                            <div class="card-text lang-hi">
+                                <strong>क्या करें:</strong>
+                                <ol>
+                                    <li>घाव को तुरंत साबुन और साफ बहते पानी से 15 मिनट तक धोएं।</li>
+                                    <li>एक साफ पट्टी लगाएं।</li>
+                                    <li>एंटी-रेबीज वैक्सीन के लिए जल्द से जल्द डॉक्टर से मिलें।</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: More First Aid -->
+            <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+                <!-- Burns Card -->
+                <div class="col">
+                    <div class="card health-card">
+                        <div class="card-body">
+                            <div class="text-center"><i class="fa-solid fa-fire card-icon" style="color: #dc3545;"></i>
+                            </div>
+                            <h5 class="card-title text-center lang-en">Minor Burns</h5>
+                            <h5 class="card-title text-center lang-hi">मामूली जलना</h5>
+                            <div class="card-text lang-en">
+                                <strong>What to do:</strong>
+                                <ol>
+                                    <li>Hold the burn under cool (not cold) running water for 10-15 minutes.</li>
+                                    <li>Remove any tight jewelry or clothing from the area gently.</li>
+                                    <li>Do NOT apply ice, oil, or toothpaste to the burn.</li>
+                                    <li>Cover with a clean, non-stick bandage.</li>
+                                </ol>
+                            </div>
+                            <div class="card-text lang-hi">
+                                <strong>क्या करें:</strong>
+                                <ol>
+                                    <li>जले हुए हिस्से को 10-15 मिनट के लिए ठंडे (बर्फ नहीं) बहते पानी के नीचे रखें।
+                                    </li>
+                                    <li>आस-पास के तंग गहने या कपड़े धीरे से हटा दें।</li>
+                                    <li>जले हुए हिस्से पर बर्फ, तेल या टूथपेस्ट न लगाएं।</li>
+                                    <li>एक साफ, नॉन-स्टिक पट्टी से ढक दें।</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Heat Stroke Card -->
+                <div class="col">
+                    <div class="card health-card">
+                        <div class="card-body">
+                            <div class="text-center"><i class="fa-solid fa-sun card-icon" style="color: #ffc107;"></i>
+                            </div>
+                            <h5 class="card-title text-center lang-en">Heat Stroke (Sunstroke)</h5>
+                            <h5 class="card-title text-center lang-hi">लू लगना (हीट स्ट्रोक)</h5>
+                            <div class="card-text lang-en">
+                                <strong>What to do:</strong>
+                                <ol>
+                                    <li>This is an emergency. Move the person to a cool, shaded area immediately.</li>
+                                    <li>Remove excess clothing.</li>
+                                    <li>Cool the person's entire body with a damp cloth or spray.</li>
+                                    <li>Give sips of cool water or ORS if they are conscious. Go to a hospital.</li>
+                                </ol>
+                            </div>
+                            <div class="card-text lang-hi">
+                                <strong>क्या करें:</strong>
+                                <ol>
+                                    <li>यह एक आपात स्थिति है। व्यक्ति को तुरंत ठंडी, छायादार जगह पर ले जाएँ।</li>
+                                    <li>अतिरिक्त कपड़े हटा दें।</li>
+                                    <li>गीले कपड़े या स्प्रे से व्यक्ति के पूरे शरीर को ठंडा करें।</li>
+                                    <li>यदि वे होश में हैं तो ठंडे पानी के घूंट या ORS दें। अस्पताल जाएँ।</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: Common Illnesses -->
+            <h2 class="text-center mb-5 lang-en">Common Illnesses</h2>
+            <h2 class="text-center mb-5 lang-hi">सामान्य बीमारियाँ</h2>
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                <!-- Fever Card -->
+                <div class="col">
+                    <div class="card health-card">
+                        <div class="card-body">
+                            <div class="text-center"><i class="fa-solid fa-temperature-full card-icon"></i></div>
+                            <h5 class="card-title text-center lang-en">Fever (बुखार)</h5>
+                            <h5 class="card-title text-center lang-hi">बुखार (Fever)</h5>
+                            <div class="card-text lang-en">
+                                <strong>Precautions:</strong>
+                                <ul>
+                                    <li>Rest and drink plenty of fluids (water, ORS, soup).</li>
+                                    <li>Use a cool, damp cloth on the forehead.</li>
+                                    <li>If fever is high or lasts more than 2 days, see a doctor.</li>
+                                </ul>
+                            </div>
+                            <div class="card-text lang-hi">
+                                <strong>सावधानियां:</strong>
+                                <ul>
+                                    <li>आराम करें और खूब सारे तरल पदार्थ (पानी, ORS, सूप) पिएं।</li>
+                                    <li>माथे पर ठंडी, गीली पट्टी का प्रयोग करें।</li>
+                                    <li>यदि बुखार तेज है या 2 दिनों से अधिक रहता है, तो डॉक्टर को दिखाएँ।</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Diarrhea Card -->
+                <div class="col">
+                    <div class="card health-card">
+                        <div class="card-body">
+                            <div class="text-center"><i class="fa-solid fa-bacteria card-icon"></i></div>
+                            <h5 class="card-title text-center lang-en">Diarrhea (दस्त)</h5>
+                            <h5 class="card-title text-center lang-hi">दस्त (Diarrhea)</h5>
+                            <div class="card-text lang-en">
+                                <strong>Precautions:</strong>
+                                <ul>
+                                    <li>The biggest danger is dehydration. Drink ORS (Oral Rehydration Solution) after
+                                        every
+                                        loose motion.</li>
+                                    <li>Eat simple, light food (rice, bananas, yogurt).</li>
+                                    <li>Avoid spicy, oily food and milk.</li>
+                                </ul>
+                            </div>
+                            <div class="card-text lang-hi">
+                                <strong>सावधानियां:</strong>
+                                <ul>
+                                    <li>सबसे बड़ा खतरा निर्जलीकरण (dehydration) है। हर दस्त के बाद ORS पिएं।</li>
+                                    <li>सादा, हल्का भोजन (चावल, केले, दही) खाएं।</li>
+                                    <li>मसालेदार, तैलीय भोजन और दूध से बचें।</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    <!-- End of NEW Section -->
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-company-box">
+                <a href="#" class="logo">
+                    <img alt="" src="{{ url_for('static', filename='asseat_2/logo1.png') }}" height="100px"
+                        width="150px">
+                    <span id="gra">ग्रामीण HEALTH GUARD</span>
+                </a>
+                <p>“A tremendous amount of needless pain and suffering can be eliminated by ensuring that health
+                    insurance is universally available.”</p>
+                <div class="footer-social">
+                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-link-box">
+                <strong>Main Link's</strong>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#our-story">About</a></li>
+                    <li><a href="#why-choose-us">Contact</a></li>
+                    <li><a href="#our-services">Services</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span class="footer-owner">ग्रामीण HEALTH GUARD</span>
+            <span class="copyright"> @Copyright 2025-2026</span>
+        </div>
+    </footer>
+
+    <!-- NEW: EMERGENCY SOS BUTTON -->
+    <a class="sos-button" data-bs-toggle="modal" data-bs-target="#sosModal" title="Emergency SOS">
+        <i class="fa-solid fa-truck-medical"></i> <!-- Ambulance icon -->
+    </a>
+
+    <!-- NEW: SOS Confirmation Modal -->
+    <div class="modal fade" id="sosModal" tabindex="-1" aria-labelledby="sosModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="sosModalLabel"><i class="fa-solid fa-triangle-exclamation"></i>
+                        Emergency Alert</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>You are about to call the **Government Ambulance Service (108)**.</p>
+                    <p class="text-muted">Only click "Call Now" if you are facing a real medical emergency.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="tel:108" class="btn btn-danger">Call Now (108)</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END OF NEW FEATURES -->
+
+
+    <!-- Bootstrap JS (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- Your Local JS with corrected path -->
+    <script src="{{ url_for('static', filename='data/add.js') }}"></script>
+
+    <!-- NEW: JavaScript for Language Toggle -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggle = document.getElementById('languageToggle');
+            const elementsEn = document.querySelectorAll('.lang-en');
+            const elementsHi = document.querySelectorAll('.lang-hi');
+
+            function updateLanguageDisplay() {
+                if (toggle.checked) {
+                    // Show Hindi
+                    elementsEn.forEach(el => el.style.display = 'none');
+                    elementsHi.forEach(el => el.style.display = 'block');
+                } else {
+                    // Show English
+                    elementsEn.forEach(el => el.style.display = 'block');
+                    elementsHi.forEach(el => el.style.display = 'none');
+                }
+            }
+
+            if (toggle) {
+                toggle.addEventListener('change', updateLanguageDisplay);
+            }
+
+            // Initial call to set correct language on page load
+            updateLanguageDisplay();
+
+            // Initialize Swiper Carousel
+            var swiper = new Swiper(".mySwiperservices", {
+                slidesPerView: 1,
+                spaceBetween: 10,
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
+                breakpoints: {
+                    700: { slidesPerView: 2, spaceBetween: 40 },
+                    1024: { slidesPerView: 3, spaceBetween: 20 },
+                },
+            });
+        });
+    </script>
+</body>

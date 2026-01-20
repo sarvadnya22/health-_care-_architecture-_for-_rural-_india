@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASHA Worker Dashboard | HealthGuard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --warning-gradient: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+            --danger-gradient: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            --dark-gradient: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+            --text-primary: #1a1a2e;
+            --text-secondary: #64748b;
+            --border-radius: 16px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .heading {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 50%, #f0f4ff 100%);
+            min-height: 100vh;
+            padding-top: 70px;
+        }
+
+        /* ===== Dashboard Header ===== */
+        .dashboard-header {
+            background: var(--dark-gradient);
+            border-radius: var(--border-radius);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .dashboard-header h2 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .dashboard-header .subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        /* ===== Modern Buttons ===== */
+        .btn-modern {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all var(--transition-speed) ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+            color: white;
+        }
+
+        .btn-warning-modern {
+            background: var(--warning-gradient);
+            box-shadow: 0 4px 15px rgba(242, 153, 74, 0.4);
+        }
+
+        .btn-warning-modern:hover {
+            box-shadow: 0 6px 20px rgba(242, 153, 74, 0.5);
+        }
+
+        .btn-danger-modern {
+            background: var(--danger-gradient);
+            box-shadow: 0 4px 15px rgba(235, 51, 73, 0.4);
+        }
+
+        .btn-danger-modern:hover {
+            box-shadow: 0 6px 20px rgba(235, 51, 73, 0.5);
+        }
+
+        .btn-success-modern {
+            background: var(--success-gradient);
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+        }
+
+        .btn-success-modern:hover {
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.5);
+        }
+
+        /* ===== Patient Cards ===== */
+        .patient-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-soft);
+            transition: all var(--transition-speed) ease;
+            overflow: hidden;
+        }
+
+        .patient-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .patient-card .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 1.25rem;
+        }
+
+        .patient-card .card-header h5 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .patient-card .card-body {
+            padding: 1.5rem;
+        }
+
+        /* ===== Priority Badges ===== */
+        .priority-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-high {
+            background: var(--danger-gradient);
+            color: white;
+        }
+
+        .priority-moderate {
+            background: var(--warning-gradient);
+            color: white;
+        }
+
+        .priority-low {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        /* ===== Status Badges ===== */
+        .status-badge {
+            padding: 0.35rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-attention {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .status-stable {
+            background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+            color: white;
+        }
+
+        /* ===== AI Tasks Section ===== */
+        .ai-tasks-card {
+            background: linear-gradient(135deg, #f9a825 0%, #ffc107 100%);
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 25px rgba(249, 168, 37, 0.3);
+        }
+
+        .ai-tasks-card .card-header {
+            background: transparent;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: #1a1a2e;
+            font-weight: 700;
+        }
+
+        .ai-tasks-card .list-group-item {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            margin-bottom: 0.5rem;
+            border-radius: 12px !important;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .ai-tasks-card .list-group-item:hover {
+            transform: translateX(8px);
+            background: white;
+        }
+
+        /* ===== Vitals & Charts ===== */
+        .vitals-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .vitals-table th {
+            background: var(--dark-gradient);
+            color: white;
+            font-weight: 600;
+            padding: 1rem;
+        }
+
+        .vitals-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .vital-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .vital-normal {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .vital-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .vital-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* ===== Prescription Cards ===== */
+        .prescription-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+            border-left: 4px solid #667eea;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .prescription-card:hover {
+            border-left-color: #764ba2;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .prescription-card h6 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== Triage/Clinical Cards ===== */
+        .triage-card {
+            background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+            border-left: 5px solid #ffc107;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+        }
+
+        /* Risk Level Styling */
+        .risk-high {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border-left: 5px solid #dc3545;
+        }
+
+        .risk-medium {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+        }
+
+        .risk-low {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-left: 5px solid #28a745;
+        }
+
+        .risk-default {
+            background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+            border-left: 5px solid #6c757d;
+        }
+
+        /* ===== AI Prediction Block ===== */
+        .ai-prediction-block {
+            white-space: pre-wrap;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            border-left: 4px solid #667eea;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 100%);
+        }
+
+        /* ===== Tabs ===== */
+        .nav-tabs {
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: 0.75rem 1.25rem;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: #667eea;
+            border: none;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #667eea;
+            font-weight: 600;
+            border: none;
+            border-bottom: 3px solid #667eea;
+            background: transparent;
+        }
+
+        /* ===== SOS Button ===== */
+        .btn-sos {
+            background: var(--danger-gradient);
+            color: white;
+            font-weight: 700;
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius);
+            border: none;
+            width: 100%;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 25px rgba(235, 51, 73, 0.4);
+            transition: all var(--transition-speed) ease;
+            animation: sos-pulse 2s infinite;
+        }
+
+        .btn-sos:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 35px rgba(235, 51, 73, 0.5);
+            color: white;
+        }
+
+        @keyframes sos-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 8px 25px rgba(235, 51, 73, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 8px 35px rgba(235, 51, 73, 0.6);
+            }
+        }
+
+        /* ===== Modal Styling ===== */
+        .modal-content {
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header.bg-danger {
+            background: var(--danger-gradient) !important;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .modal-header.bg-warning {
+            background: var(--warning-gradient) !important;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        /* ===== Scrollbar ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+        }
+
+        /* ===== Action Buttons Group ===== */
+        .action-btn-group .btn {
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .action-btn-group .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* ===== Icons ===== */
+        .triage-icon {
+            margin-right: 8px;
+        }
+
+        /* ===== Quick Stats ===== */
+        .quick-stat {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .quick-stat:hover {
+            transform: translateY(-3px);
+        }
+
+        .quick-stat .stat-number {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .quick-stat .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'navigation.html' %}
+
+    <div class="container-fluid mt-4 px-4">
+
+        <!-- Modern Dashboard Header -->
+        <div class="dashboard-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+                <h2><i class="fa-solid fa-user-nurse me-2"></i>ASHA Worker Dashboard</h2>
+                <p class="subtitle mb-0"><i class="fa-solid fa-calendar me-1"></i> {{ now().strftime('%A, %B %d, %Y') if
+                    now is defined else 'Today' }}</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <!-- AI TASKS TOGGLE BUTTON -->
+                <button class="btn btn-modern btn-warning-modern" data-bs-toggle="collapse"
+                    data-bs-target="#aiTasksSection" aria-expanded="false" aria-controls="aiTasksSection">
+                    <i class="fa-solid fa-robot me-1"></i> AI Tasks
+                </button>
+
+                <!-- ADVISORY BUTTON -->
+                {% if active_advisories or sent_updates %}
+                <button class="btn btn-modern btn-danger-modern" data-bs-toggle="modal" data-bs-target="#advisoryModal">
+                    <i class="fa-solid fa-bullhorn me-1"></i> Ministry Advisory
+                    {% if active_advisories %}
+                    <span class="badge bg-white text-danger ms-1">{{ active_advisories|length }}</span>
+                    {% endif %}
+                </button>
+                {% else %}
+                <button class="btn btn-modern" style="opacity: 0.6;" disabled>
+                    <i class="fa-solid fa-bullhorn me-1"></i> No Advisories
+                </button>
+                {% endif %}
+
+                <!-- High Priority Badge -->
+                <span class="priority-badge priority-high">
+                    <i class="fa-solid fa-star me-1"></i> {{ high_priority_count }} High Priority
+                </span>
+            </div>
+        </div>
+
+        <!-- ADVISORY MODAL -->
+        <div class="modal fade" id="advisoryModal" tabindex="-1" aria-labelledby="advisoryModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="advisoryModalLabel"><i class="fa-solid fa-triangle-exclamation"></i>
+                            Ministry Communications</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="nav nav-tabs mb-3" id="advisoryTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active text-danger" id="active-tab" data-bs-toggle="tab"
+                                    data-bs-target="#active-panel" type="button" role="tab">Active Requests</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link text-muted" id="sent-tab" data-bs-toggle="tab"
+                                    data-bs-target="#sent-panel" type="button" role="tab">Sent Updates</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <!-- ACTIVE TAB -->
+                            <div class="tab-pane fade show active" id="active-panel" role="tabpanel">
+                                {% for advisory in active_advisories %}
+                                <div class="card mb-3 border-danger">
+                                    <div
+                                        class="card-header bg-danger-subtle text-danger fw-bold d-flex justify-content-between">
+                                        <span>{{ advisory.district }} > {{ advisory.village }}</span>
+                                        <small>{{ advisory.sent_at }}</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text fs-5">{{ advisory.message }}</p>
+                                        <hr>
+                                        <form onsubmit="submitAdvisoryResponse(event, {{ advisory.id }})">
+                                            <h6 class="text-muted"><i class="fa-solid fa-reply"></i> Submit Situation
+                                                Report</h6>
+                                            <div class="mb-2">
+                                                <select class="form-select" id="status-{{ advisory.id }}" required>
+                                                    <option value="" selected disabled>Select Current Status...</option>
+                                                    <option value="Situation Normal - Monitoring">Situation Normal -
+                                                        Monitoring</option>
+                                                    <option value="Survey Initiated">Survey Initiated</option>
+                                                    <option value="Symptoms Detected - Need Meds">Symptoms Detected -
+                                                        Need Meds</option>
+                                                    <option value="CRITICAL - Need Team Deployment">CRITICAL - Need Team
+                                                        Deployment</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-2">
+                                                <textarea class="form-control" id="message-{{ advisory.id }}"
+                                                    placeholder="Add details (e.g., number of households surveyed)..."
+                                                    rows="2" required></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-sm btn-primary">Send Update to
+                                                Ministry</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <p class="text-center text-muted py-4">No pending advisories. All caught up!</p>
+                                {% endfor %}
+                            </div>
+
+                            <!-- SENT TAB -->
+                            <div class="tab-pane fade" id="sent-panel" role="tabpanel">
+                                {% for sent in sent_updates %}
+                                <div class="card mb-3 bg-light">
+                                    <div class="card-header text-muted d-flex justify-content-between">
+                                        <span>Response Sent: {{ sent.responded_at }}</span>
+                                        <span class="badge bg-secondary">Archived</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-1 text-muted small">Advisory:</p>
+                                        <p class="card-text small fst-italic mb-3">"{{ sent.message }}"</p>
+                                        <hr>
+                                        <p class="mb-0"><strong>Your Update:</strong></p>
+                                        <p class="text-info-emphasis mb-1">{{ sent.response_status }}</p>
+                                        <p class="text-muted small">{{ sent.response_message }}</p>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <p class="text-center text-muted py-4">No history of sent updates.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REFERRAL MODAL (Restored) -->
+        <div class="modal fade" id="referralModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title text-dark"><i class="fa-solid fa-user-doctor"></i> Refer Patient to
+                            Doctor</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form onsubmit="submitReferral(event)">
+                            <input type="hidden" id="referralPatientId">
+                            <div class="mb-3">
+                                <label class="form-label">Patient Name</label>
+                                <input type="text" class="form-control" id="referralPatientName" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Reason for Referral</label>
+                                <textarea class="form-control" id="referralReason" rows="3" required
+                                    placeholder="Describe symptoms or reason for referral..."></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Priority Level</label>
+                                <select class="form-select" id="referralPriority">
+                                    <option value="Routine">Routine (Check-up)</option>
+                                    <option value="Urgent">Urgent (24 Hours)</option>
+                                    <option value="Emergency">Emergency (Immediate)</option>
+                                </select>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Submit Referral</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!-- 🔥 AI TASK PRIORITIZATION SECTION 🔥 -->
+    <div class="collapse" id="aiTasksSection">
+        <div class="card ai-tasks-card mb-4">
+            <div class="card-header">
+                <i class="fa-solid fa-robot me-2"></i> Today's Prioritized Tasks (AI Recommended)
+            </div>
+            <div class="card-body p-3">
+                <div class="list-group list-group-flush">
+                    {% for patient in all_patients if patient.info.priority == 'HIGH' or patient.info.priority ==
+                    'MODERATE' %}
+                    <a href="#patient-{{ patient.info.id }}"
+                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if patient.info.priority == 'HIGH' %}
+                            <span class="priority-badge priority-high me-2">HIGH</span>
+                            {% else %}
+                            <span class="priority-badge priority-moderate me-2">MODERATE</span>
+                            {% endif %}
+                            <strong>{{ patient.info.name }}</strong> (Age: {{ patient.info.age }})
+                            <br>
+                            <small class="text-muted">
+                                {% if patient.alerts %}
+                                <i class="fa-solid fa-circle-exclamation text-danger"></i> {{ patient.alerts[0].message
+                                }}
+                                {% else %}
+                                Scheduled Follow-up / Check-in
+                                {% endif %}
+                            </small>
+                        </div>
+                        <span class="badge bg-light text-dark border">Score: {{ patient.info.urgency_score }}</span>
+                    </a>
+                    {% else %}
+                    <div class="p-3 text-center text-muted">No high priority tasks for today. Great job!</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div> <!-- End of collapse -->
+
+    <div class="row">
+        {% for patient in all_patients %}
+        {% set patient_id_str = patient.info.id | string %}
+
+        <!-- GRID CARD -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 shadow-sm border-0 patient-card-grid hover-elevate">
+                <!-- Visual Header -->
+                <div class="card-img-top bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-center"
+                    style="height: 140px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="text-center">
+                        <div class="bg-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                            style="width: 50px; height: 50px; color: #667eea;">
+                            <i class="fa-solid fa-user fa-xl"></i>
+                        </div>
+                        {% if patient.info.priority == 'HIGH' %}
+                        <span class="badge bg-danger d-block mt-1">URGENT</span>
+                        {% elif patient.info.priority == 'MODERATE' %}
+                        <span class="badge bg-warning text-dark d-block mt-1">ATTENTION</span>
+                        {% else %}
+                        <span class="badge bg-success d-block mt-1">STABLE</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-body pt-4">
+                    <h5 class="card-title fw-bold text-center mb-1">{{ patient.info.name }}</h5>
+                    <p class="text-muted text-center small mb-3">
+                        <i class="fa-solid fa-phone me-1"></i> {{ patient.info.phone_number }}
+                    </p>
+
+                    <div class="row g-2 mb-3 text-center">
+                        <div class="col-6">
+                            <div class="p-2 border rounded bg-light">
+                                <small class="d-block text-muted text-uppercase"
+                                    style="font-size: 0.7rem;">Age/Gender</small>
+                                <span class="fw-bold">{{ patient.info.age }} / {{ patient.info.gender[0] }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 border rounded bg-light">
+                                <small class="d-block text-muted text-uppercase"
+                                    style="font-size: 0.7rem;">Village</small>
+                                <span class="fw-bold">{{ patient.info.village }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong class="d-block text-uppercase text-muted small mb-1">AT A GLANCE</strong>
+                        <ul class="list-unstyled small">
+                            <li class="mb-1">
+                                <i class="fa-solid fa-notes-medical me-2 text-primary"></i>
+                                {% if patient.reports %}
+                                Last Triage: {{ (patient.reports[0].formatted_time or '').split(' ')[0] }}
+                                {% else %}
+                                No Triage History
+                                {% endif %}
+                            </li>
+                            <li class="mb-1">
+                                {% if patient.alerts %}
+                                <i class="fa-solid fa-triangle-exclamation me-2 text-danger"></i>
+                                <span class="text-danger fw-bold">Active Alert: {{ patient.alerts[0].alert_type
+                                    }}</span>
+                                {% else %}
+                                <i class="fa-solid fa-check-circle me-2 text-success"></i> No Active Alerts
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-0 pb-4 pt-0">
+                    <button class="btn btn-warning w-100 fw-bold text-uppercase py-2" style="letter-spacing: 1px;"
+                        data-bs-toggle="modal" data-bs-target="#modal-{{ patient_id_str }}">
+                        VIEW FULL RECORD
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DETAILS MODAL -->
+        <div class="modal fade" id="modal-{{ patient_id_str }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header bg-light">
+                        <div>
+                            <h5 class="modal-title fw-bold">
+                                <i class="fa-solid fa-clipboard-user me-2 text-primary"></i>
+                                {{ patient.info.name }}
+                            </h5>
+                            <small class="text-muted">ID: {{ patient.info.id }} | Ph: {{ patient.info.phone_number
+                                }}</small>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2 ms-auto">
+                            <!-- Quick Actions inside Modal -->
+                            {% if patient.info.active_call_link %}
+                            <a href="{{ patient.info.active_call_link }}" target="_blank"
+                                class="btn btn-success btn-sm">
+                                <i class="fa-solid fa-video me-1"></i> Join Call
+                            </a>
+                            <a href="{{ url_for('end_video_call', patient_id=patient.info.id) }}"
+                                class="btn btn-danger btn-sm">End</a>
+                            {% else %}
+                            <a href="{{ url_for('start_video_call', patient_id=patient.info.id) }}"
+                                class="btn btn-outline-info btn-sm">
+                                <i class="fa-solid fa-video me-1"></i> Video Call
+                            </a>
+                            {% endif %}
+
+                            <button class="btn btn-outline-warning btn-sm"
+                                onclick="openReferralModal('{{ patient.info.id }}', '{{ patient.info.name }}')">
+                                Refer
+                            </button>
+                            <a href="{{ url_for('add_triage_report', patient_id=patient.info.id) }}"
+                                class="btn btn-primary btn-sm">
+                                New Triage
+                            </a>
+                            <button type="button" class="btn-close ms-2" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                    </div>
+
+                    <div class="modal-body bg-light">
+                        <!-- EMERGENCY SOS (Keeping original logic) -->
+                        <div class="d-grid mb-3">
+                            <button class="btn btn-danger" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#sosConfirm-{{ patient_id_str }}">
+                                <i class="fa-solid fa-triangle-exclamation"></i> EMERGENCY SOS
+                            </button>
+                            <div class="collapse" id="sosConfirm-{{ patient_id_str }}">
+                                <div class="alert alert-danger mt-2 text-center p-2">
+                                    <p class="mb-2"><strong>CONFIRM:</strong> Send immediate SMS alert to ambulance
+                                        dispatcher?</p>
+                                    <a href="{{ url_for('send_sos', patient_id=patient.info.id) }}"
+                                        class="btn btn-sm btn-dark">
+                                        Yes, Send Alert Now <i class="fa-solid fa-truck-medical"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ORIGINAL TABS & CONTENT -->
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <ul class="nav nav-tabs" id="patientTab-{{ patient_id_str }}" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" data-bs-toggle="tab"
+                                            data-bs-target="#vitals-{{ patient_id_str }}" type="button"
+                                            role="tab">Vitals & Chart</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" data-bs-toggle="tab"
+                                            data-bs-target="#reports-{{ patient_id_str }}" type="button"
+                                            role="tab">Clinical Reports</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button
+                                            class="nav-link {% if patient.info.workflow and patient.info.workflow.status == 'LOCKED' %}text-danger fw-bold{% endif %}"
+                                            data-bs-toggle="tab" data-bs-target="#workflow-{{ patient_id_str }}"
+                                            type="button" role="tab">
+                                            Workflow
+                                        </button>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content pt-3">
+                                    <!-- VITALS TAB -->
+                                    <div class="tab-pane fade show active" id="vitals-{{ patient_id_str }}"
+                                        role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-12 mb-4">
+                                                <h6 class="mb-3">Recent Vitals</h6>
+                                                <table class="table table-striped table-hover table-sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Time</th>
+                                                            <th>Type</th>
+                                                            <th>Reading</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for reading in patient.readings %}
+                                                        <tr>
+                                                            <td>{{ reading.formatted_time }}</td>
+                                                            <td><span class="badge bg-secondary">{{ reading.reading_type
+                                                                    }}</span></td>
+                                                            <td class="fw-bold">{{ reading.value1 }}{% if reading.value2
+                                                                %}/{{ reading.value2 }}{% endif %}</td>
+                                                        </tr>
+                                                        {% else %}
+                                                        <tr>
+                                                            <td colspan="3" class="text-center text-muted">No recent
+                                                                readings</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-12 mb-4">
+                                                <h6 class="mb-3">Blood Pressure Trend</h6>
+                                                <div style="height: 300px;">
+                                                    <canvas id="bpChart-{{ patient_id_str }}"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- REPORTS TAB (2-Column Layout) -->
+                                    <div class="tab-pane fade" id="reports-{{ patient_id_str }}" role="tabpanel">
+                                        <div class="row">
+                                            <!-- LEFT COLUMN: Triage Reports -->
+                                            <div class="col-lg-8">
+                                                <h6 class="mb-3 text-muted text-uppercase small fw-bold">Recent Triage
+                                                    Reports</h6>
+                                                {% for report in patient.reports %}
+                                                <div
+                                                    class="triage-card mb-3 {{ 'risk-high' if 'High' in report.ai_prediction or 'Critical' in report.ai_prediction else 'risk-low' }}">
+                                                    <div class="d-flex justify-content-between">
+                                                        <h6 class="fw-bold mb-1">{{ report.formatted_time }}</h6>
+                                                        <div class="mt-1">
+                                                            <span class="badge bg-dark mb-1">AI Analysis</span>
+                                                            <div class="small p-2 bg-white rounded border">{{
+                                                                report.ai_prediction | safe }}</div>
+                                                        </div>
+                                                    </div>
+                                                    <p class="mb-1"><strong>Complaint:</strong> {{
+                                                        report.chief_complaint }}</p>
+                                                    <p class="mb-0 text-muted small"><strong>Symptoms:</strong> {{
+                                                        report.symptoms }}</p>
+                                                </div>
+                                                {% else %}
+                                                <p class="text-muted text-center py-5 bg-light rounded">No triage
+                                                    reports available.</p>
+                                                {% endfor %}
+                                            </div>
+
+                                            <!-- RIGHT COLUMN: Prescriptions -->
+                                            <div class="col-lg-4 border-start">
+                                                <h6 class="mb-3 text-muted text-uppercase small fw-bold">Active
+                                                    Prescriptions</h6>
+                                                <div class="row">
+                                                    {% for rx in patient.prescriptions %}
+                                                    <div class="col-12 mb-3">
+                                                        <div class="card prescription-card border shadow-sm h-100">
+                                                            <div class="card-body p-3">
+                                                                <div
+                                                                    class="d-flex justify-content-between align-items-center mb-2">
+                                                                    <strong>{{ rx.medication_name }}</strong>
+                                                                    <span class="badge bg-primary">{{ rx.dosage
+                                                                        }}</span>
+                                                                </div>
+                                                                {% if rx.pharmacy_name %}
+                                                                <small class="text-muted d-block mb-2"><i
+                                                                        class="fa-solid fa-store"></i> {{
+                                                                    rx.pharmacy_name }}</small>
+                                                                {% endif %}
+                                                                <a href="{{ url_for('send_reminder', prescription_id=rx.id) }}"
+                                                                    class="btn btn-success btn-sm w-100">
+                                                                    <i class="fa-solid fa-bell"></i> Remind
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% else %}
+                                                    <div class="col-12">
+                                                        <p class="text-muted text-center py-3 bg-light rounded">No
+                                                            active prescriptions.</p>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- WORKFLOW TAB -->
+                                    <div class="tab-pane fade" id="workflow-{{ patient_id_str }}" role="tabpanel">
+                                        {% if patient.info.workflow %}
+                                        <div class="alert alert-info border-2">
+                                            <h5><i class="fa-solid fa-diagram-project"></i> Care Pathway Active</h5>
+                                            <hr>
+                                            <p><strong>Current State:</strong> {{ patient.info.workflow.current_state }}
+                                            </p>
+                                            <p><strong>Next Recommended Action:</strong> {{
+                                                patient.info.workflow.next_action }}</p>
+                                            <span class="badge bg-dark">{{ patient.info.workflow.status }}</span>
+                                        </div>
+                                        {% else %}
+                                        <div class="text-center py-4 bg-light rounded">
+                                            <i class="fa-solid fa-check-circle fa-3x text-success mb-3"></i>
+                                            <p class="h5">No Active Complex Workflows</p>
+                                            <p class="text-muted">Patient is under standard monitoring.</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    </div>
+
+    <!-- REFERRAL MODAL (High Z-Index to sit above details modal) -->
+    <div class="modal fade" id="referralModal" tabindex="-1" aria-hidden="true" style="z-index: 9999;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-user-doctor"></i> Refer Patient</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="referralForm" onsubmit="submitReferral(event)">
+                        <input type="hidden" id="referralPatientId">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Patient Name</label>
+                            <input type="text" class="form-control" id="referralPatientName" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Priority Level</label>
+                            <select class="form-select" id="referralPriority">
+                                <option value="Routine">Routine (General OPD)</option>
+                                <option value="Urgent">Urgent (Within 24 Hours)</option>
+                                <option value="Emergency">Emergency (Immediate Transfer)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Reason for Referral</label>
+                            <textarea class="form-control" id="referralReason" rows="3"
+                                placeholder="Describe symptoms or reason..." required></textarea>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-dark">Send Referral</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart JS Initialization (Remains the same) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get data from Flask/Jinja
+            const all_patients_data = {{ all_patients | tojson
+        }};
+
+        all_patients_data.forEach(patient => {
+            const patientIdStr = patient.info.id.toString();
+            const modalId = `modal-${patientIdStr}`;
+            const chartId = `bpChart-${patientIdStr}`;
+            const modalEl = document.getElementById(modalId);
+
+            let myChart = null;
+
+            if (modalEl) {
+                modalEl.addEventListener('shown.bs.modal', function () {
+                    const ctx = document.getElementById(chartId);
+
+                    // Only create chart if data exists and chart doesn't exist yet
+                    if (ctx && !myChart && patient.chart_data.labels.length > 0) {
+                        myChart = new Chart(ctx.getContext('2d'), {
+                            type: 'line',
+                            data: {
+                                labels: patient.chart_data.labels,
+                                datasets: [{
+                                    label: 'Systolic (Upper)',
+                                    data: patient.chart_data.systolic,
+                                    borderColor: 'rgb(255, 99, 132)',
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    tension: 0.3,
+                                    fill: false
+                                }, {
+                                    label: 'Diastolic (Lower)',
+                                    data: patient.chart_data.diastolic,
+                                    borderColor: 'rgb(54, 162, 235)',
+                                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                    tension: 0.3,
+                                    fill: false
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false, // Better for modals
+                                scales: {
+                                    y: {
+                                        beginAtZero: false,
+                                        title: {
+                                            display: true,
+                                            text: 'BP (mmHg)'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    } else if (myChart) {
+                        myChart.resize();
+                    }
+                });
+            }
+        });
+    });
+
+        function submitAdvisoryResponse(event, advisoryId) {
+            event.preventDefault();
+            const status = document.getElementById(`status-${advisoryId}`).value;
+            const message = document.getElementById(`message-${advisoryId}`).value;
+
+            if (!status) {
+                alert("Please select a status.");
+                return;
+            }
+
+            fetch('/worker/respond_advisory', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    advisory_id: advisoryId,
+                    status: status,
+                    message: message
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Update sent to Ministry successfully!');
+                        location.reload(); // Reload to reflect changes or clear state
+                    } else {
+                        alert('Failed to send update.');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('Error connecting to server.');
+                });
+        }
+    </script>
+
+    <!-- ISOLATED SCRIPT FOR REFERRALS -->
+    <script>
+        console.log("Referral Script Loaded");
+
+        // REFERRAL FUNCTIONS
+        function openReferralModal(patientId, patientName) {
+            console.log("Opening modal for:", patientId, patientName);
+            document.getElementById('referralPatientId').value = patientId;
+            document.getElementById('referralPatientName').value = patientName;
+            const modalEl = document.getElementById('referralModal');
+            if (modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            } else {
+                console.error("Modal element not found!");
+            }
+        }
+
+        function submitReferral(event) {
+            event.preventDefault();
+            console.log("Submitting referral...");
+            const patientId = document.getElementById('referralPatientId').value;
+            const reason = document.getElementById('referralReason').value;
+            const priority = document.getElementById('referralPriority').value;
+
+            fetch('/worker/refer_patient', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ patient_id: patientId, reason: reason, priority: priority })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Response:", data);
+                    if (data.success) {
+                        alert("Referral sent successfully!");
+                        // Fix: Properly hide modal using the creation instance or re-query
+                        const modalEl = document.getElementById('referralModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                        modal.hide();
+                    } else {
+                        alert("Error: " + data.error);
+                    }
+                })
+                .catch(err => {
+                    console.error("Fetch error:", err);
+                    alert("Error: " + err);
+                });
+        }
+    </script>
+</body>
+
+</html>
